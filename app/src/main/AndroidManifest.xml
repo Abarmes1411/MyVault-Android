@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/myvault_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/myvault_icon"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyVault"
+        tools:targetApi="31">
+        <activity
+            android:name=".activities.ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.UserListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.DetailItemCustomListsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MyVaultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.CustomListsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AddOrEditReviewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.DetailContentActivity"
+            android:exported="false" />
+        <activity
+            android:name=".fragments.SearchFragment"
+            android:exported="false" />
+        <activity
+            android:name=".activities.ShowsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MangaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.AnimesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.GamesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.BooksActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MoviesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.WelcomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.InsertOrEditUser"
+            android:exported="false" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

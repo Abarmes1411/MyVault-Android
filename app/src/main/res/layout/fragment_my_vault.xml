@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    tools:context=".fragments.MyVaultFragment">
+
+
+    <ProgressBar
+        android:id="@+id/progressBarMovies"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/tvMyMovies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Peliculas"
+                android:textSize="24sp"
+                android:layout_margin="15dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMyMovies"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/tvEmptyMoviesMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡No hay elementos en esta lista, inserta alguno!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+
+            <TextView
+                android:id="@+id/tvMyShows"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Series"
+                android:textSize="24sp"
+                android:layout_margin="15dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMyShows"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/tvEmptyShowsMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡No hay elementos en esta lista, inserta alguno!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvMyGames"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Juegos"
+                android:textSize="24sp"
+                android:layout_margin="15dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMyGames"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/tvEmptyGamesMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡No hay elementos en esta lista, inserta alguno!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvMyAnimes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Animes"
+                android:textSize="24sp"
+                android:layout_margin="15dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMyAnimes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/tvEmptyAnimesMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡No hay elementos en esta lista, inserta alguno!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvMyMangas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Mangas"
+                android:textSize="24sp"
+                android:layout_margin="15dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMyMangas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/tvEmptyMangasMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡No hay elementos en esta lista, inserta alguno!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+            <TextView
+                android:id="@+id/tvMyNovels"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mis Novelas Ligeras"
+                android:textSize="24sp"
+                android:layout_margin="15dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMyNovels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/tvEmptyNovelsMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡No hay elementos en esta lista, inserta alguno!"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textAlignment="center"
+                android:textColor="@android:color/darker_gray"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+    <TextView
+        android:id="@+id/tvEmptyVaultMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="¡No hay elementos en tu Vault, inserta alguno!"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:textColor="@android:color/darker_gray"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</FrameLayout>

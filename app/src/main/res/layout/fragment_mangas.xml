@@ -1,0 +1,206 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/mangaMain"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Contenedor principal con botones siempre visibles -->
+    <LinearLayout
+        android:id="@+id/mainContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Botones de pestañas -->
+        <LinearLayout
+            android:id="@+id/btnContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <Button
+                android:id="@+id/btnMangas"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Mangas"
+                android:background="@drawable/tab_button_background"
+                android:textColor="@color/tab_inactive_color"
+                android:textAllCaps="false" />
+
+            <Button
+                android:id="@+id/btnNovelas"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="1"
+                android:text="Novelas Ligeras"
+                android:background="@drawable/tab_button_background"
+                android:textColor="@color/tab_inactive_color"
+                android:textAllCaps="false" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/tabIndicator"
+            android:layout_width="0dp"
+            android:layout_height="4dp"
+            android:layout_gravity="start"
+            android:background="@color/tab_active_color" />
+
+        <!-- Contenedor del contenido dinámico (ScrollViews) -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <!-- ProgressBar y contenido de MANGAS -->
+            <ProgressBar
+                android:id="@+id/progressBarManga"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/mainContentMangas"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/titleNews"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Novedades"
+                        android:textSize="24sp"
+                        android:layout_margin="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvNewsMangas"
+                        android:layout_width="match_parent"
+                        android:layout_height="260dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="horizontal" />
+
+                    <TextView
+                        android:id="@+id/title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lo más Top en emisión"
+                        android:textSize="24sp"
+                        android:layout_margin="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvTopOngoingMangas"
+                        android:layout_width="match_parent"
+                        android:layout_height="260dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="horizontal" />
+
+                    <TextView
+                        android:id="@+id/titleBestYearly"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lo mejor de 2024"
+                        android:textSize="24sp"
+                        android:layout_margin="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvBestMangasYearly"
+                        android:layout_width="match_parent"
+                        android:layout_height="260dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="horizontal" />
+                </LinearLayout>
+            </androidx.core.widget.NestedScrollView>
+
+            <!-- ProgressBar y contenido de NOVELAS -->
+            <ProgressBar
+                android:id="@+id/progressBarNovels"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+            <ScrollView
+                android:id="@+id/mainContentNovels"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/titleNewsNovel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Novedades"
+                        android:textSize="24sp"
+                        android:layout_margin="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvNewsNovels"
+                        android:layout_width="match_parent"
+                        android:layout_height="260dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="horizontal" />
+
+                    <TextView
+                        android:id="@+id/titleTopNovels"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Novelas mejor valoradas en emisión"
+                        android:textSize="24sp"
+                        android:layout_margin="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvTopOngoingNovels"
+                        android:layout_width="match_parent"
+                        android:layout_height="260dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="horizontal" />
+
+                    <TextView
+                        android:id="@+id/titleBestYearlyNovel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Lo mejor de 2024"
+                        android:textSize="24sp"
+                        android:layout_margin="16dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvBestMangasYearlyNovel"
+                        android:layout_width="match_parent"
+                        android:layout_height="260dp"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="8dp"
+                        android:clipToPadding="false"
+                        android:scrollbars="horizontal" />
+                </LinearLayout>
+            </ScrollView>
+        </FrameLayout>
+    </LinearLayout>
+</FrameLayout>

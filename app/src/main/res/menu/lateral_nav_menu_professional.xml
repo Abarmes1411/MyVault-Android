@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <item android:title="Peliculas"
+        android:id="@+id/movies_title"
+        android:icon="@drawable/movie"/>
+
+    <item android:title="Series"
+        android:id="@+id/shows_title"
+        android:icon="@drawable/show"/>
+
+    <item android:title="Videojuegos"
+        android:id="@+id/games_title"
+        android:icon="@drawable/game"/>
+
+    <item android:title="Animes"
+        android:id="@+id/anime_title"
+        android:icon="@drawable/ic_anime"/>
+
+    <item android:title="Manga y Novelas"
+        android:id="@+id/manga_novel_title"
+        android:icon="@drawable/manga_novel"/>
+
+    <item android:title="Mis Reseñas"
+        android:id="@+id/your_reviews_title"
+        android:icon="@drawable/ic_review"/>
+
+    <item android:title="Mis Peticiones"
+        android:id="@+id/requests_title"
+        android:icon="@drawable/ic_request"/>"/>
+
+
+    <item android:title="Cerrar Sesión"
+        android:id="@+id/logout_title"
+        android:icon="@drawable/nav_exit"/>
+
+</menu>

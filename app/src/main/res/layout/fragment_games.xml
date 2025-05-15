@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/moviesRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ProgressBar
+        android:id="@+id/progressBarMovies"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <ScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:id="@+id/main"
+        tools:context=".activities.MoviesActivity">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
+
+            <TextView
+                android:id="@+id/titleRecent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lo más reciente"
+                android:textSize="24sp"
+                android:layout_margin="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvRecentGames"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/titlePopular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Populares"
+                android:textSize="24sp"
+                android:layout_margin="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPopularGames"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+
+            <TextView
+                android:id="@+id/titleUpcoming"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Próximamente"
+                android:textSize="24sp"
+                android:layout_margin="16dp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvUpcomingGames"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:clipToPadding="false"
+                android:scrollbars="horizontal" />
+        </LinearLayout>
+    </ScrollView>
+
+
+</FrameLayout>

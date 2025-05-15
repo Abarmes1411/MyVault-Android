@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/detailContentRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <ProgressBar
+        android:id="@+id/progressBarDetailContent"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+        <ScrollView
+            android:id="@+id/main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Imagen de portada -->
+        <ImageView
+            android:id="@+id/ivCover"
+            android:layout_width="180dp"
+            android:layout_height="260dp"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Título"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:layout_marginBottom="4dp"/>
+
+        <!-- Título original -->
+        <TextView
+            android:id="@+id/tvOriginalTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Título Original"
+            android:textSize="16sp"
+            android:textAlignment="center"
+            />
+
+        <!-- Estrellas -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginVertical="16dp">
+
+            <ImageView android:id="@+id/star1" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/empty_star" />
+            <ImageView android:id="@+id/star2" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/empty_star" />
+            <ImageView android:id="@+id/star3" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/empty_star" />
+            <ImageView android:id="@+id/star4" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/empty_star" />
+            <ImageView android:id="@+id/star5" android:layout_width="32dp" android:layout_height="32dp" android:src="@drawable/empty_star" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <Button
+                android:id="@+id/btnAddVault"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Añadir a mi Baúl"/>
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnAddList"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Añadir a una lista"/>
+        </LinearLayout>
+
+        <!-- Sección de atributos -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="12dp"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView android:id="@+id/tvDescription" style="@style/AttrText" android:text="Descripción" />
+                <TextView android:id="@+id/tvReleaseDate" style="@style/AttrText" android:text="Estreno" />
+                <TextView android:id="@+id/tvGenres" style="@style/AttrText" android:text="Géneros" />
+                <TextView android:id="@+id/tvOriginalRating" style="@style/AttrText" android:text="Calificación original (sobre 10)" />
+                <TextView android:id="@+id/tvPlatforms" style="@style/AttrText" android:text="Plataformas disponibles" />
+                <TextView android:id="@+id/tvWebsite" style="@style/AttrText" android:text="Sitio Web" />
+                <TextView android:id="@+id/tvDevelopers" style="@style/AttrText" android:text="Desarrolladores" />
+                <TextView android:id="@+id/tvEpisodes" style="@style/AttrText" android:text="Capítulos" />
+                <TextView android:id="@+id/tvStudios" style="@style/AttrText" android:text="Estudios" />
+                <TextView android:id="@+id/tvContentOrigin" style="@style/AttrText" android:text="Origen del contenido" />
+                <TextView android:id="@+id/tvAIOpinion" style="@style/AttrText" android:text="Opinión general" />
+                <TextView android:id="@+id/tvAIReview" style="@style/AttrText" android:text="Review IA" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Opinión de usuarios -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/tvUserOpinion"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Opiniones de usuarios"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+
+            <Button
+                android:id="@+id/btnAddUserReview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"/>
+        </LinearLayout>
+
+        <!-- Lista de opiniones -->
+        <ListView
+            android:id="@+id/lvUserReview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@android:color/darker_gray"
+            android:dividerHeight="1dp"/>
+
+        <TextView
+            android:id="@+id/tvEmptyMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¡No existen opiniones de usuarios, sé el primero!"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:textAlignment="center"
+            android:textColor="@android:color/darker_gray"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"/>
+    </LinearLayout>
+
+</ScrollView>
+</FrameLayout>

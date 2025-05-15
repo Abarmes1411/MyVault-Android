@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "245246957457",
+    "firebase_url": "https://myvault-cf31b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "myvault-cf31b",
+    "storage_bucket": "myvault-cf31b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245246957457:android:5efbe09208137ef847ec30",
+        "android_client_info": {
+          "package_name": "com.example.myvault"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHZ3sP19PP52CtnNm2uy2iexiSmdeIaak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

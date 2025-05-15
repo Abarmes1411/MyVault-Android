@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.HomeFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/containerFrame"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:paddingBottom="120dp"
+            />
+
+        <Button
+            android:id="@+id/btnHomeLogout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/dark_blue"
+            android:padding="10dp"
+            android:text="Cerrar Sesión"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnMoviesPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:backgroundTint="@color/dark_blue"
+            android:padding="10dp"
+            android:text="Películas"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnShowsPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:backgroundTint="@color/dark_blue"
+            android:padding="10dp"
+            android:text="Series"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnGamesPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:backgroundTint="@color/dark_blue"
+            android:padding="10dp"
+            android:text="Videojuegos"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnAnimePage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:backgroundTint="@color/dark_blue"
+            android:padding="10dp"
+            android:text="Anime"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnMangaPage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:backgroundTint="@color/dark_blue"
+            android:padding="10dp"
+            android:text="Manga y Novelas"
+            android:textSize="20sp" />
+    </LinearLayout>
+</FrameLayout>
