@@ -22,15 +22,6 @@
             android:name=".activities.DetailItemCustomListsActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SettingsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.MyVaultActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.ProfileActivity"
-            android:exported="false" />
-        <activity
             android:name=".activities.CustomListsActivity"
             android:exported="false" />
         <activity
@@ -41,27 +32,6 @@
             android:exported="false" />
         <activity
             android:name=".fragments.SearchFragment"
-            android:exported="false" />
-        <activity
-            android:name=".activities.ShowsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.MangaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.AnimesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.GamesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.BooksActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.MoviesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.WelcomeActivity"
             android:exported="false" />
         <activity
             android:name=".activities.InsertOrEditUser"
