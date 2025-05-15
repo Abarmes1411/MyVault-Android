@@ -47,6 +47,7 @@ public class UserReviewsFragment extends Fragment {
     UserReviewService userReviewService;
     String category_ID;
     String selectedUserId;
+    private boolean isViewCreated = false;
 
 
 
@@ -104,9 +105,6 @@ public class UserReviewsFragment extends Fragment {
         Log.d("UserReviewsFragment", "selectedUserId: " + selectedUserId);
         if (selectedUserId == null) {
             selectedUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            loadUserReviews(selectedUserId);
-        }else{
-            loadUserReviews(selectedUserId);
         }
 
 
@@ -126,8 +124,25 @@ public class UserReviewsFragment extends Fragment {
                             case 0:
                                 Log.d("EditarReview", "Editar Review de : " + selectedReview.getContent().getTitle());
                                 Intent intent = new Intent(requireContext(), AddOrEditReviewActivity.class);
+                                intent.putExtra("editMode", true);
+                                intent.putExtra("reviewComment", selectedReview.getReview().getComment());
+                                intent.putExtra("reviewRating", selectedReview.getReview().getRating());
+                                intent.putExtra("contentKey", selectedReview.getContent().getId());
+
+                                intent.putExtra("categoryID", selectedReview.getContent().getCategoryID());
+
+                                String categoryId = selectedReview.getContent().getCategoryID();
+                                switch (categoryId) {
+                                    case "cat_1": intent.putExtra("contentTMDBID", selectedReview.getContent().getId()); break;
+                                    case "cat_2": intent.putExtra("contentTMDBTVID", selectedReview.getContent().getId()); break;
+                                    case "cat_3": intent.putExtra("contentGamesID", selectedReview.getContent().getId()); break;
+                                    case "cat_4": intent.putExtra("contentAnimeID", selectedReview.getContent().getId()); break;
+                                    case "cat_5": intent.putExtra("contentMangaID", selectedReview.getContent().getId()); break;
+                                    case "cat_6": intent.putExtra("contentNovelID", selectedReview.getContent().getId()); break;
+                                }
 
                                 startActivity(intent);
+
                                 break;
                             case 1:
                                 Log.d("EliminarReview", "Eliminar Review de: " + selectedReview.getContent().getTitle());
@@ -153,6 +168,10 @@ public class UserReviewsFragment extends Fragment {
 
         return view;
     }
+
+
+
+
 
     private void loadUserReviews(String uid) {
         DatabaseReference contentRef = FirebaseDatabase.getInstance().getReference("content");
@@ -200,7 +219,11 @@ public class UserReviewsFragment extends Fragment {
         loadUserReviews(selectedUserId);
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadUserReviews(selectedUserId);
+    }
 
 
 }

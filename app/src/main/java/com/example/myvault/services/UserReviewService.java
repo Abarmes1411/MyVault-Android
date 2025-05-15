@@ -24,35 +24,49 @@ public class UserReviewService {
 
     }
 
-    public void insert(String contentID, UserReview userReview) {
-        DatabaseReference contentReviewRef = db.getReference("content").child(contentID).child("userReviews");
-        DatabaseReference newReference = contentReviewRef.push();
-        String id = newReference.getKey();
-        userReview.setId(id);
+    public void insertOrUpdate(String contentID, UserReview userReview) {
+        DatabaseReference contentReviewRef = db.getReference("content")
+                .child(contentID)
+                .child("userReviews");
 
-        // Nodo de contenido
-        newReference.setValue(userReview)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("InsertReview", "Reseña guardada en contenido con ID: " + id);
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("InsertReview", "Error al guardar en contenido", e);
-                });
+        contentReviewRef.orderByChild("userID").equalTo(userReview.getUserID())
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.exists()) {
+                            // Ya existe una review: actualizamos
+                            for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                                String existingReviewId = reviewSnapshot.getKey();
+                                userReview.setId(existingReviewId);
 
-        // Nodo del usuario
-        DatabaseReference userReviewRef = db.getReference("users")
-                .child(userReview.getUserID())
-                .child("userReviews")
-                .child(id);
+                                update(contentID, userReview);
+                                Log.d("InsertReview", "Review existente, actualizando con ID: " + existingReviewId);
+                                break;
+                            }
+                        } else {
+                            DatabaseReference newReference = contentReviewRef.push();
+                            String id = newReference.getKey();
+                            userReview.setId(id);
 
-        userReviewRef.setValue(userReview)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("InsertReview", "Reseña guardada también en el nodo del usuario");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("InsertReview", "Error al guardar en el nodo del usuario", e);
+                            newReference.setValue(userReview)
+                                    .addOnSuccessListener(aVoid -> Log.d("InsertReview", "Review nueva insertada con ID: " + id))
+                                    .addOnFailureListener(e -> Log.e("InsertReview", "Error al insertar la review", e));
+
+                            db.getReference("users")
+                                    .child(userReview.getUserID())
+                                    .child("userReviews")
+                                    .child(id)
+                                    .setValue(userReview);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("InsertReview", "Error al comprobar si la review existe", error.toException());
+                    }
                 });
     }
+
 
     public void update(String contentID, UserReview userReview) {
         // Actualizar en contenido

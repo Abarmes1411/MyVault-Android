@@ -100,7 +100,7 @@ public class AddOrEditReviewActivity extends AppCompatActivity {
             Log.d("ReviewActivity", "ID del usuario: " + userId);
 
 
-            userReviewService.insert(contentKey, userReview);
+            userReviewService.insertOrUpdate(contentKey, userReview);
 
             Toast.makeText(this, "Reseña guardada", Toast.LENGTH_SHORT).show();
 
@@ -162,7 +162,25 @@ public class AddOrEditReviewActivity extends AppCompatActivity {
 
         setupStarRating();
 
+
+        Intent intent = getIntent();
+        boolean editMode = intent.getBooleanExtra("editMode", false);
+
+        if (editMode) {
+            String comment = intent.getStringExtra("reviewComment");
+            double rating = intent.getDoubleExtra("reviewRating", 0);
+
+            if (comment != null) {
+                editReview.setText(comment);
+            }
+
+            currentRating = rating;
+            updateStarUI(currentRating);
+        }
+
     }
+
+
 
     private void setupStarRating() {
         ImageView[] stars = {star1, star2, star3, star4, star5};
@@ -195,5 +213,17 @@ public class AddOrEditReviewActivity extends AppCompatActivity {
             }
         }
     }
+
+    private void updateStarUI(double rating) {
+        ImageView[] stars = {star1, star2, star3, star4, star5};
+        for (int i = 0; i < stars.length; i++) {
+            if (i < rating) {
+                stars[i].setImageResource(R.drawable.full_star);
+            } else {
+                stars[i].setImageResource(R.drawable.empty_star);
+            }
+        }
+    }
+
 
 }
