@@ -68,7 +68,7 @@ public class UserListActivity extends AppCompatActivity {
 
             if (friendTask.isSuccessful() && friendTask.getResult().exists()) {
                 for (DataSnapshot snapshot : friendTask.getResult().getChildren()) {
-                    friendIds.add(snapshot.getValue(String.class));
+                    friendIds.add(snapshot.getKey());
                 }
             }
 

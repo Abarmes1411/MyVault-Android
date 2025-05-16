@@ -13,6 +13,10 @@ public class User extends DomainEntity implements Serializable {
     private String profilePic;
     private Map<String, CustomList> customLists;
     private Map<String, Boolean> friends;
+    public Map<String, UserReview> userReviews;
+    public Map<String, String> myVault;
+
+
     public User() {
     }
 
@@ -83,5 +87,21 @@ public class User extends DomainEntity implements Serializable {
 
     public void setFriends(Map<String, Boolean> friends) {
         this.friends = friends;
+    }
+
+    public Map<String, UserReview> getUserReviews() {
+        return userReviews;
+    }
+
+    public void setUserReviews(Map<String, UserReview> userReviews) {
+        this.userReviews = userReviews;
+    }
+
+    public Map<String, String> getMyVault() {
+        return myVault;
+    }
+
+    public void setMyVault(Map<String, String> myVault) {
+        this.myVault = myVault;
     }
 }

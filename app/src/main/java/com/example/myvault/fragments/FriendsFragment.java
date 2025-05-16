@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.example.myvault.R;
 import com.example.myvault.activities.ChatActivity;
 import com.example.myvault.activities.UserListActivity;
@@ -19,7 +21,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FriendsFragment extends Fragment {
 
@@ -68,38 +72,63 @@ public class FriendsFragment extends Fragment {
 
         lvFriendsList.setOnItemClickListener((parent, view1, position, id) -> {
             User selectedUser = userList.get(position);
+            String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            String selectedUid = selectedUser.getId();
 
-            String[] opciones = {"Comenzar Chat", "Reviews del Usuario", "Eliminar Amigo"};
-            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("Opciones")
-                    .setItems(opciones, (dialog, which) -> {
-                        switch (which) {
-                            case 0:
-                                Log.d("Amigos", "Iniciar chat con: " + selectedUser.getUsername());
-                                Intent chatIntent = new Intent(requireContext(), ChatActivity.class);
-                                chatIntent.putExtra("chatUserId", selectedUser.getId());
-                                startActivity(chatIntent);
-                                break;
-                            case 1:
-                                Log.d("Amigos", "Ver reviews de: " + selectedUser.getUsername());
-                                UserReviewsFragment fragment = new UserReviewsFragment();
-                                Bundle args = new Bundle();
-                                args.putString("selectedUserId", selectedUser.getId());
-                                fragment.setArguments(args);
-                                requireActivity().getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.containerFrame, fragment)
-                                        .addToBackStack(null)
-                                        .commit();
-                                break;
-                            case 2:
-                                Log.d("Amigos", "Eliminar amigo: " + selectedUser.getId());
-                                eliminarAmigo(selectedUser.getId());
-                                break;
+            DatabaseReference friendshipRef = FirebaseDatabase.getInstance()
+                    .getReference("users")
+                    .child(currentUid)
+                    .child("friends")
+                    .child(selectedUid);
+
+            friendshipRef.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult().exists()) {
+                    String[] opciones = {"Comenzar Chat", "Reviews del Usuario", "Eliminar Amigo"};
+                    new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                            .setTitle("Opciones")
+                            .setItems(opciones, (dialog, which) -> {
+                                switch (which) {
+                                    case 0:
+                                        Log.d("Amigos", "Iniciar chat con: " + selectedUser.getUsername());
+                                        Intent chatIntent = new Intent(requireContext(), ChatActivity.class);
+                                        chatIntent.putExtra("chatUserId", selectedUid);
+                                        startActivity(chatIntent);
+                                        break;
+                                    case 1:
+                                        Log.d("Amigos", "Ver reviews de: " + selectedUser.getUsername());
+                                        UserReviewsFragment fragment = new UserReviewsFragment();
+                                        Bundle args = new Bundle();
+                                        args.putString("selectedUserId", selectedUid);
+                                        fragment.setArguments(args);
+                                        requireActivity().getSupportFragmentManager().beginTransaction()
+                                                .replace(R.id.containerFrame, fragment)
+                                                .addToBackStack(null)
+                                                .commit();
+                                        break;
+                                    case 2:
+                                        Log.d("Amigos", "Eliminar amigo: " + selectedUid);
+                                        eliminarAmigo(selectedUid);
+                                        break;
+                                }
+                            })
+                            .setNegativeButton("Cancelar", null)
+                            .show();
+                } else {
+                    Toast.makeText(requireContext(),
+                            "Este usuario ya no es tu amigo.",
+                            Toast.LENGTH_LONG).show();
+
+                    for (int i = 0; i < userList.size(); i++) {
+                        if (userList.get(i).getId().equals(selectedUid)) {
+                            userList.remove(i);
+                            adapter.notifyDataSetChanged();
+                            break;
                         }
-                    })
-                    .setNegativeButton("Cancelar", null)
-                    .show();
+                    }
+                }
+            });
         });
+
 
         buttonAddFriend.setOnClickListener(v -> {
             Intent intent = new Intent(requireContext(), UserListActivity.class);
@@ -158,25 +187,40 @@ public class FriendsFragment extends Fragment {
 
     private void eliminarAmigo(String friendUid) {
         String currentUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        DatabaseReference friendRef = FirebaseDatabase.getInstance()
+        Log.d("Amigos", "Eliminando amistad entre: " + currentUid + " y " + friendUid);
+
+        DatabaseReference currentUserRef = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(currentUid)
                 .child("friends")
                 .child(friendUid);
-        Log.d("Amigos", "Eliminando amigo: " + friendUid);
-        Log.d("Amigos", "Current UID: " + currentUid);
-        friendRef.removeValue().addOnSuccessListener(aVoid -> {
-            Log.d("Amigos", "Amigo eliminado: " + friendUid);
-            // Eliminar de la lista local
-            for (int i = 0; i < userList.size(); i++) {
-                if (userList.get(i).getId().equals(friendUid)) {
-                    userList.remove(i);
-                    adapter.notifyDataSetChanged();
-                    break;
-                }
-            }
-        }).addOnFailureListener(e -> {
-            Log.e("Amigos", "Error al eliminar amigo", e);
-        });
+
+        DatabaseReference friendUserRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(friendUid)
+                .child("friends")
+                .child(currentUid);
+
+        // Eliminar de amigo en ambos nodos
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("/users/" + currentUid + "/friends/" + friendUid, null);
+        updates.put("/users/" + friendUid + "/friends/" + currentUid, null);
+
+        FirebaseDatabase.getInstance().getReference().updateChildren(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Amigos", "Amistad eliminada correctamente de ambos nodos.");
+                    // Actualizar la lista en el fragmento
+                    for (int i = 0; i < userList.size(); i++) {
+                        if (userList.get(i).getId().equals(friendUid)) {
+                            userList.remove(i);
+                            adapter.notifyDataSetChanged();
+                            break;
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Amigos", "Error al eliminar amistad en ambos nodos", e);
+                });
     }
+
 }

@@ -19,6 +19,8 @@ import com.example.myvault.models.ReviewWithContentAUX;
 import com.example.myvault.models.User;
 import com.example.myvault.models.UserReview;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -100,26 +102,50 @@ public class UserListAdapter extends ArrayAdapter<User> {
         }
 
         if (mode == Mode.DEFAULT) {
-            DatabaseReference requestRef = FirebaseDatabase.getInstance()
+
+            Log.d("UserListAdapter", "Modo DEFAULT -> currentUid: " + currentUid + ", targetUid: " + targetUid);
+
+            DatabaseReference requestCheckRef = FirebaseDatabase.getInstance()
                     .getReference("friend_requests")
                     .child(targetUid).child(currentUid);
+            requestCheckRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    Log.d("UserListAdapter", "Snapshot exists: " + snapshot.exists());
 
-            requestRef.get().addOnSuccessListener(snapshot -> {
-                if (snapshot.exists()) {
-                    pendingRequest.setVisibility(View.VISIBLE);
-                } else {
-                    sendRequest.setVisibility(View.VISIBLE);
-                    sendRequest.setOnClickListener(v -> {
-                        requestRef.setValue("pending").addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                sendRequest.setVisibility(View.GONE);
-                                pendingRequest.setVisibility(View.VISIBLE);
-                            }
+                    if (snapshot.exists()) {
+                        pendingRequest.setVisibility(View.VISIBLE);
+                        sendRequest.setVisibility(View.GONE);
+                    } else {
+                        pendingRequest.setVisibility(View.GONE);
+                        sendRequest.setVisibility(View.VISIBLE);
+
+                        sendRequest.setOnClickListener(v -> {
+                            Log.d("UserListAdapter", "Enviando solicitud de amistad de " + currentUid + " a " + targetUid);
+
+                            requestCheckRef.setValue("pending").addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    Log.d("UserListAdapter", "Solicitud enviada con éxito a: " + targetUid);
+                                    sendRequest.setVisibility(View.GONE);
+                                    pendingRequest.setVisibility(View.VISIBLE);
+                                } else {
+                                    Log.e("UserListAdapter", "Error al enviar solicitud", task.getException());
+                                }
+                            });
                         });
-                    });
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e("UserListAdapter", "Error al comprobar solicitud", error.toException());
                 }
             });
+
         } else if (mode == Mode.REQUESTS) {
+
+            Log.d("UserListAdapter", "Modo REQUESTS -> currentUid: " + currentUid + ", targetUid (remitente): " + targetUid);
+
             acceptRequest.setVisibility(View.VISIBLE);
             refuseRequest.setVisibility(View.VISIBLE);
 
@@ -128,35 +154,43 @@ public class UserListAdapter extends ArrayAdapter<User> {
 
                 usersRef.child(currentUid).child("friends").child(targetUid).setValue(true)
                         .addOnSuccessListener(aVoid -> {
-                            // Insertar currentUid en la lista de amigos del target
                             usersRef.child(targetUid).child("friends").child(currentUid).setValue(true)
                                     .addOnSuccessListener(aVoid2 -> {
-                                        // Eliminar la solicitud correctamente
-                                        FirebaseDatabase.getInstance()
-                                                .getReference("friend_requests")
-                                                .child(targetUid).child(currentUid)
-                                                .removeValue();
                                         FirebaseDatabase.getInstance()
                                                 .getReference("friend_requests")
                                                 .child(currentUid).child(targetUid)
-                                                .removeValue();
-
-                                        // Quitar visualmente de la lista
-                                        items.remove(position);
-                                        notifyDataSetChanged();
-                                    });
-                        });
+                                                .removeValue()
+                                                .addOnCompleteListener(task -> {
+                                                    if (task.isSuccessful()) {
+                                                        Log.d("UserListAdapter", "Solicitud aceptada y eliminada correctamente");
+                                                        items.remove(position);
+                                                        notifyDataSetChanged();
+                                                    } else {
+                                                        Log.e("UserListAdapter", "No se pudo eliminar la solicitud tras aceptar.");
+                                                    }
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    Log.e("UserListAdapter", "Error al eliminar la solicitud tras aceptar: ", e);
+                                                });
+                                    })
+                                    .addOnFailureListener(e -> Log.e("UserListAdapter", "Error al añadir al otro usuario como amigo", e));
+                        })
+                        .addOnFailureListener(e -> Log.e("UserListAdapter", "Error al añadir al usuario actual como amigo", e));
             });
-
 
             refuseRequest.setOnClickListener(v -> {
                 FirebaseDatabase.getInstance()
                         .getReference("friend_requests")
-                        .child(currentUid).child(targetUid).removeValue();
-                items.remove(position);
-                notifyDataSetChanged();
+                        .child(currentUid).child(targetUid)
+                        .removeValue()
+                        .addOnCompleteListener(task -> {
+                            Log.d("UserListAdapter", "Solicitud rechazada (eliminada)");
+                            items.remove(position);
+                            notifyDataSetChanged();
+                        });
             });
         }
+
 
         return convertView;
     }
