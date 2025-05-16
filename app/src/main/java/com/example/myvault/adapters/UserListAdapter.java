@@ -69,6 +69,7 @@ public class UserListAdapter extends ArrayAdapter<User> {
             tvNameSurname.setText("");
 
             Log.e("UserListAdapter", "Item o ID nulo en posición: " + position);
+            Log.e("UserListAdapter", "Item: " + item);
             return emptyView;
         }
 
