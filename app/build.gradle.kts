@@ -57,6 +57,7 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation ("com.google.firebase:firebase-firestore:24.10.0")
     implementation ("com.google.android.flexbox:flexbox:3.0.0")
+    implementation("com.google.firebase:firebase-storage")
 
 
 

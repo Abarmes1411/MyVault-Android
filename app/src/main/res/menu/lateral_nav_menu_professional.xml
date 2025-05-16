@@ -1,39 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <group android:id="@+id/group_content">
+        <item android:title="Películas"
+            android:id="@+id/movies_title"
+            android:icon="@drawable/movie" />
 
+        <item android:title="Series"
+            android:id="@+id/shows_title"
+            android:icon="@drawable/show" />
 
-    <item android:title="Peliculas"
-        android:id="@+id/movies_title"
-        android:icon="@drawable/movie"/>
+        <item android:title="Videojuegos"
+            android:id="@+id/games_title"
+            android:icon="@drawable/game" />
 
-    <item android:title="Series"
-        android:id="@+id/shows_title"
-        android:icon="@drawable/show"/>
+        <item android:title="Animes"
+            android:id="@+id/anime_title"
+            android:icon="@drawable/ic_anime" />
 
-    <item android:title="Videojuegos"
-        android:id="@+id/games_title"
-        android:icon="@drawable/game"/>
+        <item android:title="Manga y Novelas"
+            android:id="@+id/manga_novel_title"
+            android:icon="@drawable/manga_novel" />
+    </group>
 
-    <item android:title="Animes"
-        android:id="@+id/anime_title"
-        android:icon="@drawable/ic_anime"/>
+    <group android:id="@+id/group_user">
+        <item android:title="Mis Reseñas"
+            android:id="@+id/your_reviews_title"
+            android:icon="@drawable/ic_review" />
 
-    <item android:title="Manga y Novelas"
-        android:id="@+id/manga_novel_title"
-        android:icon="@drawable/manga_novel"/>
+        <item android:title="Mis Peticiones"
+            android:id="@+id/requests_title"
+            android:icon="@drawable/ic_request" />
+    </group>
 
-    <item android:title="Mis Reseñas"
-        android:id="@+id/your_reviews_title"
-        android:icon="@drawable/ic_review"/>
+    <group android:id="@+id/group_settings">
+        <item android:title="Configuración"
+            android:id="@+id/settings_title"
+            android:icon="@drawable/ic_settings" />
 
-    <item android:title="Mis Peticiones"
-        android:id="@+id/requests_title"
-        android:icon="@drawable/ic_request"/>"/>
-
-
-    <item android:title="Cerrar Sesión"
-        android:id="@+id/logout_title"
-        android:icon="@drawable/nav_exit"/>
+        <item android:title="Cerrar Sesión"
+            android:id="@+id/logout_title"
+            android:icon="@drawable/nav_exit" />
+    </group>
 
 </menu>

@@ -21,6 +21,18 @@
         android:padding="16dp"
         android:gravity="center_horizontal">
 
+        <!-- Título del perfil -->
+        <TextView
+            android:id="@+id/tvSuggestProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¡Pulsa en la foto para editarla!"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:layout_marginBottom="20dp" />
+
         <!-- Foto de perfil -->
         <ImageView
             android:id="@+id/ivProfilePic"

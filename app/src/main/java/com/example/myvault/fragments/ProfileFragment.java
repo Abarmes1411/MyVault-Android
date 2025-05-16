@@ -1,6 +1,9 @@
 package com.example.myvault.fragments;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -14,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myvault.R;
@@ -25,6 +29,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -43,6 +49,14 @@ public class ProfileFragment extends Fragment {
     private User users;
     private View mainContent;
     private View progressBar;
+    private String selectedProfileImage;
+    private TextView tvSuggestProfile;
+
+
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private Uri imageUri;
+    private boolean newImageSelected = false;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -95,7 +109,6 @@ public class ProfileFragment extends Fragment {
         mainContent = view.findViewById(R.id.main);
         progressBar = view.findViewById(R.id.progressBarProfile);
 
-        // Mostrar solo el ProgressBar al principio
         mainContent.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
@@ -103,7 +116,8 @@ public class ProfileFragment extends Fragment {
         etProfileName = view.findViewById(R.id.etProfileName);
         etProfileSurname = view.findViewById(R.id.etProfileSurname);
         etProfileEmail = view.findViewById(R.id.etProfileEmail);
-
+        tvSuggestProfile = view.findViewById(R.id.tvSuggestProfile);
+        tvSuggestProfile.setVisibility(View.GONE);
 
         btnEditProfile = view.findViewById(R.id.btnEditProfile);
         btnSaveProfile = view.findViewById(R.id.btnSaveProfile);
@@ -111,7 +125,6 @@ public class ProfileFragment extends Fragment {
         btnSaveProfile.setVisibility(View.GONE);
 
         uidCurrentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        Log.d("UID", uidCurrentUser);
         reference = FirebaseDatabase.getInstance().getReference("users").child(uidCurrentUser);
 
         loadUserData();
@@ -119,8 +132,22 @@ public class ProfileFragment extends Fragment {
         btnEditProfile.setOnClickListener(v -> enableEditing());
 
         btnSaveProfile.setOnClickListener(v -> saveChanges());
+
+        // Desactivar el click hasta que se habilite la edición
+        ivProfilePic.setEnabled(false);
+        ivProfilePic.setOnClickListener(v -> {
+            if (ivProfilePic.isEnabled()) {
+                showImagePickerDialog();
+            }
+        });
+
+
         return view;
     }
+
+
+
+
 
     private void loadUserData() {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -136,9 +163,12 @@ public class ProfileFragment extends Fragment {
                         etProfileName.setText(user.getName());
                         etProfileSurname.setText(user.getSurname());
                         etProfileEmail.setText(user.getEmail());
-                        if(user.getProfilePic() != null){
-                            Picasso.get().load(user.getProfilePic()).into(ivProfilePic);
+
+                        if (user.getProfilePic() != null) {
+                            int imageResId = getResources().getIdentifier(user.getProfilePic(), "drawable", requireContext().getPackageName());
+                            ivProfilePic.setImageResource(imageResId);
                         }
+
 
                         progressBar.setVisibility(View.GONE);
                         mainContent.setVisibility(View.VISIBLE);
@@ -161,10 +191,13 @@ public class ProfileFragment extends Fragment {
         etProfileName.setEnabled(true);
         etProfileSurname.setEnabled(true);
         etProfileEmail.setEnabled(false);
+        ivProfilePic.setEnabled(true);
 
         btnEditProfile.setVisibility(View.GONE);
         btnSaveProfile.setVisibility(View.VISIBLE);
+        tvSuggestProfile.setVisibility(View.VISIBLE);
     }
+
 
     private void saveChanges() {
         String newUsername = etProfileUsername.getText().toString().trim();
@@ -176,25 +209,102 @@ public class ProfileFragment extends Fragment {
             return;
         }
 
-        if(FirebaseDatabase.getInstance().getReference("users").equals(newUsername)){
-            Toast.makeText(context, "El nombre de usuario ya existe", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Actualizar los datos en Firebase
+        // Actualizar datos en Realtime Database
         reference.child("name").setValue(newName);
         reference.child("surname").setValue(newSurname);
         reference.child("username").setValue(newUsername);
 
-        disableEditing();
+        // Si hay imagen nueva, subirla
+        if (newImageSelected && selectedProfileImage != null) {
+            reference.child("profilePic").setValue(selectedProfileImage);
+        }
+        else {
+            disableEditing();
+        }
     }
+
 
     private void disableEditing() {
         etProfileUsername.setEnabled(false);
         etProfileName.setEnabled(false);
         etProfileSurname.setEnabled(false);
         etProfileEmail.setEnabled(false);
+        ivProfilePic.setEnabled(false);
+
         btnEditProfile.setVisibility(View.VISIBLE);
         btnSaveProfile.setVisibility(View.GONE);
+        tvSuggestProfile.setVisibility(View.GONE);
     }
+
+    private void showImagePickerDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Elige una imagen de perfil");
+
+        View view = getLayoutInflater().inflate(R.layout.dialog_image_picker, null);
+        builder.setView(view);
+
+        AlertDialog dialog = builder.create();
+
+        ImageView img1 = view.findViewById(R.id.movie_profile_pic_id);
+        ImageView img2 = view.findViewById(R.id.show_profile_pic_id);
+        ImageView img3 = view.findViewById(R.id.game_profile_pic_id);
+        ImageView img4 = view.findViewById(R.id.manganovel_profile_pic_id);
+
+        View.OnClickListener listener = v -> {
+            String selected = (String) v.getTag();
+            selectedProfileImage = selected;
+
+            int resId = getResources().getIdentifier(selected, "drawable", requireContext().getPackageName());
+            ivProfilePic.setImageResource(resId);
+
+            newImageSelected = true;
+            dialog.dismiss();
+        };
+
+        img1.setOnClickListener(listener);
+        img2.setOnClickListener(listener);
+        img3.setOnClickListener(listener);
+        img4.setOnClickListener(listener);
+
+        dialog.show();
+    }
+
+    /**
+
+    private void openFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            imageUri = data.getData();
+            ivProfilePic.setImageURI(imageUri);
+            newImageSelected = true;
+        }
+    }
+
+
+    private void uploadImageToFirebase(Runnable onSuccessCallback) {
+        String fileName = "profile_" + uidCurrentUser + ".jpg";
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("profile_pics/" + fileName);
+
+        storageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String imageUrl = uri.toString();
+                    reference.child("profilePic").setValue(imageUrl);
+                    Toast.makeText(getContext(), "Foto de perfil actualizada", Toast.LENGTH_SHORT).show();
+                    onSuccessCallback.run();
+                }))
+                .addOnFailureListener(e -> {
+                    Log.e("FIREBASE_STORAGE", "Error al subir imagen: " + e.getMessage());
+                    Toast.makeText(getContext(), "Error al subir la imagen", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    */
 }

@@ -33,6 +33,7 @@ import com.example.myvault.fragments.ProfileFragment;
 import com.example.myvault.fragments.RequestsFragment;
 import com.example.myvault.fragments.SearchFragment;
 import com.example.myvault.fragments.FriendsFragment;
+import com.example.myvault.fragments.SettingsFragment;
 import com.example.myvault.fragments.ShowsFragment;
 import com.example.myvault.fragments.UserReviewsFragment;
 import com.example.myvault.models.User;
@@ -160,8 +161,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.your_reviews_title) {
                 selectedFragment = new UserReviewsFragment();
                 tvMyVault.setText("Reseñas");
-
-
+            }else if (id == R.id.settings_title) {
+                selectedFragment = new SettingsFragment();
+                tvMyVault.setText("Configuración");
 
             }else if (id == R.id.requests_title) {
                 selectedFragment = new RequestsFragment();
