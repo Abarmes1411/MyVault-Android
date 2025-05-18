@@ -101,7 +101,7 @@ public class DetailContentActivity extends AppCompatActivity {
         } else if (animeID != null) {
             queryContent(contentRef, "animeID", animeID);
         } else if (novelID != null) {
-            queryContent(contentRef, "novelID", novelID);
+            queryContent(contentRef, "mangaID", novelID);
         }
 
 

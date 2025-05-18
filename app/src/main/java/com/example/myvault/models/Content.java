@@ -1,5 +1,7 @@
 package com.example.myvault.models;
 
+import com.example.myvault.enums.Categories;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -71,6 +73,16 @@ public class Content extends DomainEntity implements Serializable {
         this.source = source;
     }
 
+
+    //Constructor para el search
+    public Content(String tmdbID, String title, String date, String image, Categories category) {
+        super();
+        this.tmdbID = tmdbID;
+        this.title = title;
+        this.releaseDate = date;
+        this.coverImage = image;
+    }
+
     // Constructor para peliculas y series
     public Content(String categoryID, String title, String description, String releaseDate, List<String> genresTMDB, String rating, String coverImage, String source, String tmdbID, String tmdbTVID) {
         super();
@@ -108,7 +120,7 @@ public class Content extends DomainEntity implements Serializable {
         this.animeID = animeID;
     }
 
-    // Constructor para mangas
+    // Constructor para mangas y novelas
     public Content(String categoryID, String title, String originalTitle, String description, String releaseDate, String rating, String coverImage, String source, List<String> genresManga, String popularity, String mangaID) {
         super();
         this.categoryID = categoryID;

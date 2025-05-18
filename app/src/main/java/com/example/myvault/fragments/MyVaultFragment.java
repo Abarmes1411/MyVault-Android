@@ -13,13 +13,11 @@ import android.view.ViewGroup;
 
 import com.example.myvault.R;
 import com.example.myvault.adapters.DetailListAdapter;
-import com.example.myvault.adapters.MovieAdapter;
 import com.example.myvault.models.Content;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;

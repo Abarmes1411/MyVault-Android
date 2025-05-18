@@ -21,10 +21,13 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
 
     private List<Content> searchList;
     private Context context;
+    private SearchAdapter.OnItemClickListener listener;
 
-    public SearchAdapter(List<Content> gameList, Context context) {
+
+    public SearchAdapter(List<Content> gameList, Context context, SearchAdapter.OnItemClickListener listener) {
         this.searchList = gameList;
         this.context = context;
+        this.listener = listener;
     }
 
     @NonNull
@@ -37,16 +40,23 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
     @Override
     public void onBindViewHolder(@NonNull SearchAdapter.SearchViewHolder holder, int position) {
 
-        Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH);
-
         Content search = searchList.get(position);
         holder.tvTitle.setText(search.getTitle());
-
         holder.tvDate.setText(search.getReleaseDate());
 
-        Picasso.get().load(search.getCoverImage()).into(holder.ivCover);
+        if(search.getCoverImage()==null || search.getCoverImage().equals("")){
+            holder.ivCover.setImageResource(R.drawable.no_image_available);
+        }else{
+            Picasso.get().load(search.getCoverImage()).into(holder.ivCover);
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(search);
+            }
+        });
     }
+
 
     @Override
     public int getItemCount() {
@@ -63,5 +73,9 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.SearchView
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDate = itemView.findViewById(R.id.tvDate);
         }
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Content content);
     }
 }

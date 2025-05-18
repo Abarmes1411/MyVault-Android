@@ -1,131 +1,151 @@
 package com.example.myvault.fragments;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myvault.R;
+import com.example.myvault.activities.DetailContentActivity;
+import com.example.myvault.adapters.DetailListAdapter;
 import com.example.myvault.adapters.SearchAdapter;
+import com.example.myvault.enums.Categories;
 import com.example.myvault.models.Content;
-import com.google.firebase.database.DataSnapshot;
+import com.example.myvault.services.SearchService;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements SearchAdapter.OnItemClickListener {
 
     private EditText searchBar;
+    private Spinner categorySpinner;
+    private Button btnSearch;
+    private ProgressBar progressBar;
     private RecyclerView rvSearch;
     private SearchAdapter adapter;
-    private List<Content> allContent = new ArrayList<>();
-    private List<Content> filteredContent = new ArrayList<>();
+
+    private List<Content> allResults = new ArrayList<>();
+    private DatabaseReference firebaseRef;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         searchBar = view.findViewById(R.id.etSearch);
+        categorySpinner = view.findViewById(R.id.spinnerSpeciality);
+        btnSearch = view.findViewById(R.id.btnSearch);
+        progressBar = view.findViewById(R.id.progressBarSearch);
         rvSearch = view.findViewById(R.id.rvSearch);
-        rvSearch.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvSearch.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
-        adapter = new SearchAdapter(filteredContent, getContext());
+        firebaseRef = FirebaseDatabase.getInstance().getReference("content");
+
+        ArrayAdapter<Categories> spinnerAdapter = new ArrayAdapter<>(
+                getContext(), android.R.layout.simple_spinner_item, Categories.values());
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(spinnerAdapter);
+
+        adapter = new SearchAdapter(allResults, getContext(), this);
         rvSearch.setAdapter(adapter);
 
-        loadAllContent();
-
-        searchBar.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filter(s.toString());
+        btnSearch.setOnClickListener(v -> {
+            String query = searchBar.getText().toString().trim();
+            if (query.isEmpty()) {
+                Toast.makeText(getContext(), "Escribe algún titulo", Toast.LENGTH_SHORT).show();
+                return;
             }
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            Categories selected = (Categories) categorySpinner.getSelectedItem();
+            performSearch(query, selected);
         });
 
         return view;
     }
 
-    private void loadAllContent() {
-        Log.d("SearchFragment", "Iniciando carga de contenido desde Realtime Database...");
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("content");
-
-        allContent.clear();
-        reference.get().addOnSuccessListener(dataSnapshot -> {
-            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                try {
-                    String title = snapshot.child("title").getValue(String.class);
-                    String releaseDate = snapshot.child("releaseDate").getValue(String.class);
-                    String coverImage = snapshot.child("coverImage").getValue(String.class);
-
-                    Log.d("SearchFragment", "Doc ID: " + snapshot.getKey() + ", title: " + title);
-
-                    if (title == null || releaseDate == null || coverImage == null) {
-                        Log.w("SearchFragment", "Documento con campos nulos: " + snapshot.getKey());
-                        continue;
-                    }
-
-                    Content content = new Content();
-                    content.setTitle(title);
-                    content.setReleaseDate(releaseDate);
-                    content.setCoverImage(coverImage);
-
-                    allContent.add(content);
-                    Log.d("SearchFragment", "Contenido añadido: " + title);
-                } catch (Exception e) {
-                    Log.e("SearchFragment", "Error al parsear documento: " + e.getMessage(), e);
-                }
-            }
-
-            Log.d("SearchFragment", "Contenido cargado correctamente. Total: " + allContent.size());
-            filter(searchBar.getText().toString());
-        }).addOnFailureListener(e -> {
-            Log.e("SearchFragment", "Error al cargar contenido: " + e.getMessage(), e);
-        });
-    }
-
-
-
-
-
-    private void filter(String text) {
-        String normalizedText = text.replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-        Log.d("SearchFragment", "Filtrando por: " + normalizedText);
-        filteredContent.clear();
-        for (Content c : allContent) {
-            if (c.getTitle() != null) {
-                // Normaliza el título de cada contenido también
-                String normalizedTitle = c.getTitle().replaceAll("[^a-zA-Z0-9]", "").toLowerCase();
-                Log.d("SearchFragment", "Título actual: " + normalizedTitle);
-                if (normalizedTitle.contains(normalizedText)) {
-                    filteredContent.add(c);
-                }
-            }
-        }
-        Log.d("SearchFragment", "Resultados filtrados: " + filteredContent.size());
+    private void performSearch(String query, Categories category) {
+        progressBar.setVisibility(View.VISIBLE);
+        allResults.clear();
         adapter.notifyDataSetChanged();
+
+        SearchService.searchMinimal(query, category, new SearchService.Callback<List<Content>>() {
+            @Override
+            public void onSuccess(List<Content> results) {
+                progressBar.setVisibility(View.GONE);
+                allResults.addAll(results);
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onError(Exception e) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(getContext(), "Error en búsqueda: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }, getContext());
+
     }
+
+    @Override
+    public void onItemClick(Content content) {
+        if (content.getCategoryID() == null) {
+            Toast.makeText(getContext(), "Error: categoryID es null para este contenido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        SearchService.fetchDetails(content, new SearchService.Callback<Content>() {
+            @Override
+            public void onSuccess(Content detailedContent) {
+                Intent intent = new Intent(getContext(), DetailContentActivity.class);
+
+                switch (detailedContent.getCategoryID()) {
+                    case "cat_1":
+                        intent.putExtra("contentTMDBID", detailedContent.getTmdbID());
+                        break;
+                    case "cat_2":
+                        intent.putExtra("contentTMDBTVID", detailedContent.getTmdbTVID());
+                        break;
+                    case "cat_3":
+                        intent.putExtra("contentGamesID", detailedContent.getGameID());
+                        break;
+                    case "cat_4":
+                        intent.putExtra("contentAnimeID", detailedContent.getAnimeID());
+                        break;
+                    case "cat_5":
+                        intent.putExtra("contentMangaID", detailedContent.getMangaID());
+                        break;
+                    case "cat_6":
+                        intent.putExtra("contentNovelID", detailedContent.getMangaID());
+                        break;
+                }
+
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(getContext(), "Error al obtener detalles: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }, getContext());
+    }
+
 
 
 }
+
+
+
+
 
