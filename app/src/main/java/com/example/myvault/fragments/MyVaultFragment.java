@@ -1,5 +1,6 @@
 package com.example.myvault.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.myvault.R;
+import com.example.myvault.activities.DetailContentActivity;
 import com.example.myvault.adapters.DetailListAdapter;
 import com.example.myvault.models.Content;
 import com.google.firebase.auth.FirebaseAuth;
@@ -91,42 +93,38 @@ public class MyVaultFragment extends Fragment {
         rvMangas  = view.findViewById(R.id.rvMyMangas);
         rvNovels  = view.findViewById(R.id.rvMyNovels);
 
+        adapterMovies = new DetailListAdapter(contentMovies, requireContext(), item -> openDetailActivity(item));
+        adapterSeries = new DetailListAdapter(contentSeries, requireContext(), item -> openDetailActivity(item));
+        adapterGames = new DetailListAdapter(contentGames, requireContext(), item -> openDetailActivity(item));
+        adapterAnimes = new DetailListAdapter(contentAnimes, requireContext(), item -> openDetailActivity(item));
+        adapterMangas = new DetailListAdapter(contentMangas, requireContext(), item -> openDetailActivity(item));
+        adapterNovels = new DetailListAdapter(contentNovels, requireContext(), item -> openDetailActivity(item));
+
         // Asignar adapters vacíos con sus respectivas listas
         rvMovies.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapterMovies = new DetailListAdapter(contentMovies, requireContext(), item -> {
-            Log.d("ItemClick", item.getTitle());
-        });
         rvMovies.setAdapter(adapterMovies);
 
         rvSeries.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapterSeries = new DetailListAdapter(contentSeries, requireContext(), item -> {
-            Log.d("ItemClick", item.getTitle());
-        });
         rvSeries.setAdapter(adapterSeries);
 
         rvGames.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapterGames = new DetailListAdapter(contentGames, requireContext(), item -> {
-            Log.d("ItemClick", item.getTitle());
-        });
+
         rvGames.setAdapter(adapterGames);
 
         rvAnimes.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapterAnimes = new DetailListAdapter(contentAnimes, requireContext(), item -> {
-            Log.d("ItemClick", item.getTitle());
-        });
+
         rvAnimes.setAdapter(adapterAnimes);
 
         rvMangas.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapterMangas = new DetailListAdapter(contentMangas, requireContext(), item -> {
-            Log.d("ItemClick", item.getTitle());
-        });
+
         rvMangas.setAdapter(adapterMangas);
 
         rvNovels.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
-        adapterNovels = new DetailListAdapter(contentNovels, requireContext(), item -> {
-            Log.d("ItemClick", item.getTitle());
-        });
+
         rvNovels.setAdapter(adapterNovels);
+
+
+
 
         // Cargar el contenido almacenado en el vault del usuario
         loadVaultContent();
@@ -285,6 +283,35 @@ public class MyVaultFragment extends Fragment {
     }
 
 
+    private void openDetailActivity(Content item) {
+        Intent intent = new Intent(requireContext(), DetailContentActivity.class);
+
+        switch (item.getCategoryID()) {
+            case "cat_1":
+                intent.putExtra("contentTMDBID", item.getTmdbID());
+                break;
+            case "cat_2":
+                intent.putExtra("contentTMDBTVID", item.getTmdbTVID());
+                break;
+            case "cat_3":
+                intent.putExtra("contentGamesID", item.getGameID());
+                break;
+            case "cat_4":
+                intent.putExtra("contentAnimeID", item.getAnimeID());
+                break;
+            case "cat_5":
+                intent.putExtra("contentMangaID", item.getMangaID());
+                break;
+            case "cat_6":
+                intent.putExtra("contentNovelID", item.getMangaID());
+                break;
+            default:
+                Log.w("openDetailActivity", "Categoría no reconocida: " + item.getCategoryID());
+                return;
+        }
+
+        startActivity(intent);
+    }
 
 
 }

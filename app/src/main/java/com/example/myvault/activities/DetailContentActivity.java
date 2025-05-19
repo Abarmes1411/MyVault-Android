@@ -1,6 +1,7 @@
 package com.example.myvault.activities;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -28,8 +29,14 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.myvault.R;
 import com.example.myvault.adapters.UserReviewsInDetailContentAdapter;
@@ -45,14 +52,17 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class DetailContentActivity extends AppCompatActivity {
 
@@ -67,6 +77,8 @@ public class DetailContentActivity extends AppCompatActivity {
     private View detailContentRoot;
     private String userID;
     private ActivityResultLauncher<Intent> addReviewLauncher;
+    String apiKey;
+
 
 
     @Override
@@ -89,6 +101,14 @@ public class DetailContentActivity extends AppCompatActivity {
         String mangaID = getIntent().getStringExtra("contentMangaID");
         String animeID = getIntent().getStringExtra("contentAnimeID");
         String novelID = getIntent().getStringExtra("contentNovelID");
+        apiKey = getResources().getString(R.string.deepl_api_key);
+
+
+
+        progressBar = findViewById(R.id.progressBarDetailContent);
+        detailContentRoot = findViewById(R.id.detailContentRoot);
+        progressBar.setVisibility(View.VISIBLE);
+        detailContentRoot.setVisibility(View.GONE);
 
         if (tmdbID != null) {
             queryContent(contentRef, "tmdbID", tmdbID);
@@ -103,6 +123,7 @@ public class DetailContentActivity extends AppCompatActivity {
         } else if (novelID != null) {
             queryContent(contentRef, "mangaID", novelID);
         }
+
 
 
         addReviewLauncher = registerForActivityResult(
@@ -143,11 +164,7 @@ public class DetailContentActivity extends AppCompatActivity {
         btnAddList = findViewById(R.id.btnAddList);
         btnAddVault = findViewById(R.id.btnAddVault);
 
-        progressBar = findViewById(R.id.progressBarDetailContent);
-        detailContentRoot = findViewById(R.id.detailContentRoot);
 
-        progressBar.setVisibility(View.VISIBLE);
-        detailContentRoot.setVisibility(View.GONE);
 
 
 
@@ -596,9 +613,6 @@ public class DetailContentActivity extends AppCompatActivity {
 
 
 
-
-
-
     private void queryContent(DatabaseReference ref, String child, String id) {
         ref.orderByChild(child).equalTo(id)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -608,27 +622,123 @@ public class DetailContentActivity extends AppCompatActivity {
                             content = contentSnap.getValue(Content.class);
                             if (content != null) {
                                 contentKey = contentSnap.getKey();
+                                String descripcionHTMLLimpia = cleanDescription(content.getDescription());
+
+                                if (!descripcionHTMLLimpia.isEmpty() && descripcionHTMLLimpia.length() > 20) {
+                                    if (englishCheck(descripcionHTMLLimpia)) {
+                                        traducirConDeepL(descripcionHTMLLimpia, traduccion -> {
+                                            content.setDescription(traduccion);
+
+                                            FirebaseDatabase.getInstance().getReference("content")
+                                                    .child(contentKey)
+                                                    .child("description")
+                                                    .setValue(traduccion);
+
+                                            if (tvDescription != null) {
+                                                tvDescription.setText("'" + traduccion + "'");
+                                            }
+
+                                            loadComponents();
+                                            loadUserReviewsAndDisplayStars(contentKey);
+                                            loadDB(contentKey);
+
+
+                                            progressBar.setVisibility(View.GONE);
+                                            detailContentRoot.setVisibility(View.VISIBLE);
+
+                                        }, DetailContentActivity.this);
+                                        return;
+                                    } else {
+                                        content.setDescription(descripcionHTMLLimpia);
+                                    }
+                                } else {
+                                    content.setDescription("Sinopsis no disponible");
+                                }
+
+
                                 loadComponents();
                                 loadUserReviewsAndDisplayStars(contentKey);
                                 loadDB(contentKey);
+
+                                progressBar.setVisibility(View.GONE);
+                                detailContentRoot.setVisibility(View.VISIBLE);
                                 break;
                             }
-                            progressBar.setVisibility(View.GONE);
-                            detailContentRoot.setVisibility(View.VISIBLE);
                         }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
                         Log.e("FIREBASE", "Error al cargar el contenido: " + error.getMessage());
+                        progressBar.setVisibility(View.GONE);
+                        detailContentRoot.setVisibility(View.VISIBLE);
                     }
                 });
     }
+
+
 
     private String cleanDescription(String rawDescription) {
         if (rawDescription == null) return "";
         return Html.fromHtml(rawDescription, Html.FROM_HTML_MODE_LEGACY).toString().trim();
     }
+
+    private void traducirConDeepL(String textoOriginal, Consumer<String> callback, Context context) {
+        String url = "https://api-free.deepl.com/v2/translate";
+
+        RequestQueue queue = Volley.newRequestQueue(context);
+
+        StringRequest request = new StringRequest(Request.Method.POST, url,
+                response -> {
+                    try {
+                        JSONObject jsonResponse = new JSONObject(response);
+                        JSONArray translations = jsonResponse.getJSONArray("translations");
+                        String textoTraducido = translations.getJSONObject(0).getString("text");
+                        callback.accept(textoTraducido);
+                    } catch (JSONException e) {
+                        Log.e("DeepL", "Error al parsear traducción: " + e.getMessage());
+                        callback.accept(textoOriginal);
+                    }
+                },
+                error -> {
+                    Log.e("DeepL", "Error al traducir: " + error.toString());
+                    callback.accept(textoOriginal);
+                }) {
+
+            @Override
+            public Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("auth_key", apiKey);
+                params.put("text", textoOriginal);
+                params.put("target_lang", "ES");
+                return params;
+            }
+
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                try {
+                    String jsonString = new String(response.data, StandardCharsets.UTF_8);
+                    return Response.success(jsonString, HttpHeaderParser.parseCacheHeaders(response));
+                } catch (Exception e) {
+                    return Response.error(new ParseError(e));
+                }
+            }
+        };
+
+
+        queue.add(request);
+    }
+
+    private boolean englishCheck(String texto) {
+        String lower = texto.toLowerCase();
+        return lower.contains("the ") || lower.contains("is ") || lower.contains("with ") || lower.contains("a ") || lower.contains("in ");
+    }
+
+
+
+
+
+
 
 
     // Géneros de películas

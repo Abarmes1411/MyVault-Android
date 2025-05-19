@@ -1,5 +1,6 @@
 package com.example.myvault.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,7 +38,7 @@ public class DetailItemCustomListsActivity extends AppCompatActivity {
     private String uidCurrentUser;
     private String listName;
     private List<Content> contentList;
-    private Button btnAddElement, btnBack;
+    private Button btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,9 +158,8 @@ public class DetailItemCustomListsActivity extends AppCompatActivity {
 
         Picasso.get().load(content.getCoverImage()).into(ivCover);
 
-        itemView.setOnClickListener(v -> {
-            Toast.makeText(this, content.getTitle(), Toast.LENGTH_SHORT).show();
-        });
+        itemView.setOnClickListener(v -> openDetailActivity(content));
+
 
         flexboxLayout.addView(itemView);
     }
@@ -167,6 +167,36 @@ public class DetailItemCustomListsActivity extends AppCompatActivity {
     private void toggleEmptyMessage(boolean show) {
         TextView emptyMessage = findViewById(R.id.tvEmptyMessage);
         emptyMessage.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    private void openDetailActivity(Content item) {
+        Intent intent = new Intent(this, DetailContentActivity.class);
+
+        switch (item.getCategoryID()) {
+            case "cat_1":
+                intent.putExtra("contentTMDBID", item.getTmdbID());
+                break;
+            case "cat_2":
+                intent.putExtra("contentTMDBTVID", item.getTmdbTVID());
+                break;
+            case "cat_3":
+                intent.putExtra("contentGamesID", item.getGameID());
+                break;
+            case "cat_4":
+                intent.putExtra("contentAnimeID", item.getAnimeID());
+                break;
+            case "cat_5":
+                intent.putExtra("contentMangaID", item.getMangaID());
+                break;
+            case "cat_6":
+                intent.putExtra("contentNovelID", item.getMangaID());
+                break;
+            default:
+                Log.w("openDetailActivity", "Categoría no reconocida: " + item.getCategoryID());
+                return;
+        }
+
+        startActivity(intent);
     }
 
 }
