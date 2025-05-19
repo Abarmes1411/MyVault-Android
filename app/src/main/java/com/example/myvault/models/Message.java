@@ -9,20 +9,20 @@ public class Message extends DomainEntity implements Serializable {
     private String chatID;
     private String userID;
     private String message;
-    private String messageDate;
+    private String timestamp;
     private CustomList customList;
 
     public Message() {
     }
 
 
-    public Message(String type, String chatID, String userID, String message, String messageDate) {
+    public Message(String type, String chatID, String userID, String message, String timestamp) {
         super();
         this.type = type;
         this.chatID = chatID;
         this.userID = userID;
         this.message = message;
-        this.messageDate = messageDate;
+        this.timestamp = timestamp;
     }
 
     public String getUserID() {
@@ -49,12 +49,12 @@ public class Message extends DomainEntity implements Serializable {
         this.message = message;
     }
 
-    public String getMessageDate() {
-        return messageDate;
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public void setMessageDate(String messageDate) {
-        this.messageDate = messageDate;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getType() {

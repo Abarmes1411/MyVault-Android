@@ -1,9 +1,13 @@
 package com.example.myvault.activities;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
@@ -16,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myvault.R;
 import com.example.myvault.adapters.ChatAdapter;
+import com.example.myvault.models.CustomList;
 import com.example.myvault.models.Message;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -35,6 +40,7 @@ import java.util.Map;
 public class ChatActivity extends AppCompatActivity {
 
     private String chatKey;
+    private ImageButton btnSendCustomList, btnBack;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +63,9 @@ public class ChatActivity extends AppCompatActivity {
         Log.d("ChatActivity", "ID del usuario con el que se chateará: " + chatUserId);
         Log.d("ChatActivity", "ID del usuario autenticado: " + currentUserId);
 
+        btnBack = findViewById(R.id.btnBack);
+        btnSendCustomList = findViewById(R.id.btnSendCustomList);
+
         // Generar una clave única para el chat.
         chatKey = generateChatKey(currentUserId, chatUserId);
         Log.d("ChatActivity", "Clave de chat generada: " + chatKey);
@@ -74,10 +83,11 @@ public class ChatActivity extends AppCompatActivity {
                     // Si no existe, crear el nodo del chat.
                     Map<String, Object> chatData = new HashMap<>();
                     // Almacenar los UIDs de los participantes en una lista.
-                    List<String> chatUsersList = new ArrayList<>();
-                    chatUsersList.add(currentUserId);
-                    chatUsersList.add(chatUserId);
-                    chatData.put("users", chatUsersList);
+                    Map<String, Boolean> chatUsersMap = new HashMap<>();
+                    chatUsersMap.put(currentUserId, true);
+                    chatUsersMap.put(chatUserId, true);
+                    chatData.put("users", chatUsersMap);
+
                     // Crear un nodo vacío para los mensajes.
                     chatData.put("messages", new HashMap<String, Object>());
 
@@ -100,6 +110,102 @@ public class ChatActivity extends AppCompatActivity {
                 Log.e("ChatActivity", "Error en la consulta del chat", error.toException());
             }
         });
+
+        // Botón para regresar.
+        btnBack.setOnClickListener(view -> {
+            finish();
+        });
+
+        // Botón para enviar listas personalizadas.
+        btnSendCustomList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+                DatabaseReference listsRef = FirebaseDatabase.getInstance()
+                        .getReference("users").child(userID).child("customLists");
+
+                listsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (!snapshot.exists()) {
+                            Toast.makeText(ChatActivity.this, "No tienes listas creadas", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        List<String> listNames = new ArrayList<>();
+                        for (DataSnapshot listSnapshot : snapshot.getChildren()) {
+                            listNames.add(listSnapshot.getKey());
+                        }
+
+                        String[] listArray = listNames.toArray(new String[0]);
+                        final int[] selectedIndex = {-1};
+
+                        new AlertDialog.Builder(ChatActivity.this)
+                                .setTitle("Selecciona una lista para compartir")
+                                .setSingleChoiceItems(listArray, -1, (dialog, which) -> {
+                                    selectedIndex[0] = which;
+                                })
+                                .setPositiveButton("Confirmar", (dialog, which) -> {
+                                    if (selectedIndex[0] != -1) {
+                                        String selectedListKey = listNames.get(selectedIndex[0]);
+                                        String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                                        DatabaseReference selectedListRef = FirebaseDatabase.getInstance()
+                                                .getReference("users")
+                                                .child(currentUserId)
+                                                .child("customLists")
+                                                .child(selectedListKey);
+
+                                        selectedListRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                CustomList selectedList = snapshot.getValue(CustomList.class);
+                                                if (selectedList != null) {
+                                                    selectedList.setId(selectedListKey);
+
+                                                    String timestamp = new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
+
+                                                    Message listMessage = new Message("custom_list", chatKey, currentUserId, "", timestamp);
+                                                    listMessage.setCustomList(selectedList);
+
+                                                    DatabaseReference messagesRef = FirebaseDatabase.getInstance()
+                                                            .getReference("chats")
+                                                            .child(chatKey)
+                                                            .child("messages");
+
+                                                    messagesRef.push().setValue(listMessage)
+                                                            .addOnSuccessListener(aVoid -> {
+                                                                Toast.makeText(ChatActivity.this, "Lista enviada", Toast.LENGTH_SHORT).show();
+                                                            })
+                                                            .addOnFailureListener(e -> {
+                                                                Toast.makeText(ChatActivity.this, "Error al enviar la lista", Toast.LENGTH_SHORT).show();
+                                                            });
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(ChatActivity.this, "Error al obtener lista", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+
+                                    } else {
+                                        Toast.makeText(ChatActivity.this, "No seleccionaste ninguna lista", Toast.LENGTH_SHORT).show();
+                                    }
+                                })
+
+                                .setNegativeButton("Cancelar", null)
+                                .show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Toast.makeText(ChatActivity.this, "Error al cargar listas", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
     }
 
     // Función auxiliar para generar la clave única del chat usando los UIDs de los usuarios.
@@ -162,7 +268,7 @@ public class ChatActivity extends AppCompatActivity {
                 return;
             }
             // Obtener timestamp formateado.
-            String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.getDefault())
+            String timestamp = new SimpleDateFormat("HH:mm", Locale.getDefault())
                     .format(new Date());
             String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 

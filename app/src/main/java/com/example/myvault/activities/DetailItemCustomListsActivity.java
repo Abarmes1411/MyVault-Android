@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +39,8 @@ public class DetailItemCustomListsActivity extends AppCompatActivity {
     private String uidCurrentUser;
     private String listName;
     private List<Content> contentList;
-    private Button btnBack;
+    private ImageButton btnBack;
+    private String senderUid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +70,20 @@ public class DetailItemCustomListsActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
 
         listName = getIntent().getStringExtra("listName");
+        senderUid = getIntent().getStringExtra("senderUid");
+
         tvListName.setText(listName);
 
         uidCurrentUser = FirebaseAuth.getInstance().getCurrentUser().getUid();
         Log.d("DetailListActivity", "UID del usuario actual: " + uidCurrentUser);
         Log.d("DetailListActivity", "Nombre de la lista: " + listName);
+
+        String listOwnerUid = senderUid != null ? senderUid : uidCurrentUser;
+
+
         reference = FirebaseDatabase.getInstance()
                 .getReference("users")
-                .child(uidCurrentUser)
+                .child(listOwnerUid)
                 .child("customLists")
                 .child(listName)
                 .child("items");
