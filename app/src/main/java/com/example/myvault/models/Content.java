@@ -17,6 +17,7 @@ public class Content extends DomainEntity implements Serializable {
     private String source;
     private String origin;
     private String originalTitle;
+    private UserReview userReview;
 
 
 
@@ -413,6 +414,14 @@ public class Content extends DomainEntity implements Serializable {
 
     public void setGenresTVTMDB(List<String> genresTVTMDB) {
         this.genresTVTMDB = genresTVTMDB;
+    }
+
+    public UserReview getUserReview() {
+        return userReview;
+    }
+
+    public void setUserReview(UserReview userReview) {
+        this.userReview = userReview;
     }
 
     @Override

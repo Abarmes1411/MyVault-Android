@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:padding="8dp"
-            android:background="@android:drawable/editbox_background"
+            android:background="@drawable/rounded_spinner_background"
             android:spinnerMode="dropdown"/>
 
         <Button
@@ -35,6 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Buscar"
+            android:backgroundTint="@color/light_blue"
             android:layout_marginStart="8dp"/>
     </LinearLayout>
 
@@ -44,6 +45,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/tvWait"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Esperando al usuario..."
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textAlignment="center"
+        android:layout_marginBottom="4dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvSearch"

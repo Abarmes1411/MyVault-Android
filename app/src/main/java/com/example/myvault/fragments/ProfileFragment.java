@@ -165,9 +165,15 @@ public class ProfileFragment extends Fragment {
                         etProfileEmail.setText(user.getEmail());
 
                         if (user.getProfilePic() != null) {
-                            int imageResId = getResources().getIdentifier(user.getProfilePic(), "drawable", requireContext().getPackageName());
-                            ivProfilePic.setImageResource(imageResId);
+                            String resourceName = user.getProfilePic().replace(".png", "");
+                            int imageResId = getResources().getIdentifier(resourceName, "drawable", requireContext().getPackageName());
+                            if (imageResId != 0) {
+                                ivProfilePic.setImageResource(imageResId);
+                            } else {
+                                ivProfilePic.setImageResource(R.drawable.movie_profile_pic);
+                            }
                         }
+
 
 
                         progressBar.setVisibility(View.GONE);
@@ -254,12 +260,15 @@ public class ProfileFragment extends Fragment {
             String selected = (String) v.getTag();
             selectedProfileImage = selected;
 
-            int resId = getResources().getIdentifier(selected, "drawable", requireContext().getPackageName());
+            String resourceName = selected.replace(".png", "");
+
+            int resId = getResources().getIdentifier(resourceName, "drawable", requireContext().getPackageName());
             ivProfilePic.setImageResource(resId);
 
             newImageSelected = true;
             dialog.dismiss();
         };
+
 
         img1.setOnClickListener(listener);
         img2.setOnClickListener(listener);

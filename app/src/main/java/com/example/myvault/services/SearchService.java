@@ -62,16 +62,16 @@ public class SearchService {
 
 
     public static void fetchDetails(Content minimal, Callback<Content> callback, Context context) {
-        Log.d("ContentService", "Buscando detalles de: " + minimal.getId());
-        Log.d("ContentService", "Categoría: " + minimal.getCategoryID());
-        Log.d("ContentService", "Título: " + minimal.getTitle());
+        Log.d("SearchService", "Buscando detalles de: " + minimal.getId());
+        Log.d("SearchService", "Categoría: " + minimal.getCategoryID());
+        Log.d("SearchService", "Título: " + minimal.getTitle());
         String categoryID = minimal.getCategoryID();
         if (categoryID == null) {
             callback.onError(new IllegalArgumentException("categoryID es null en Content"));
             return;
         }
         Categories catenum = getCategoryEnumFromID(categoryID);
-
+        Log.d("SearchService", "Categoría enum: " + catenum);
         switch (catenum) {
             case PELICULAS:
                 obtenerDetallesTMDb(minimal.getId(), "movie", callback, context);
@@ -294,7 +294,7 @@ public class SearchService {
     private static void obtenerDetallesTMDb(String id, String type, Callback<Content> callback, Context context) {
 
         String url = "https://api.themoviedb.org/3/" + type + "/" + id + "?api_key=87bb7efee694a2a79d9514b2c909e544&language=es-ES";
-
+        Log.d("ContentService", "URL: " + url);
         RequestQueue queue = Volley.newRequestQueue(context);
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("content");
         ContentService contentService = new ContentService(context);
@@ -302,9 +302,9 @@ public class SearchService {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
                     try {
-                        String title = response.getString("title");
+                        String title = type.equals("tv") ? response.getString("name") : response.getString("title");
                         String description = response.getString("overview");
-                        String releaseDate = response.getString("release_date");
+                        String releaseDate = type.equals("tv") ? response.getString("first_air_date") : response.getString("release_date");
                         String posterPath = response.optString("poster_path", null);
                         double rating = response.optDouble("vote_average", 0.0);
                         String coverImage = posterPath != null ? "https://image.tmdb.org/t/p/w500" + posterPath : "";
@@ -313,7 +313,8 @@ public class SearchService {
                         JSONArray genreArray = response.optJSONArray("genres");
                         if (genreArray != null) {
                             for (int j = 0; j < genreArray.length(); j++) {
-                                genres.add(genreArray.getString(j));
+                                JSONObject genreObject = genreArray.getJSONObject(j);
+                                genres.add(String.valueOf(genreObject.getInt("id")));
                             }
                         }
 
@@ -340,21 +341,50 @@ public class SearchService {
 
                                             if (needsUpdate) {
                                                 Log.d("ContentService", "Actualizando serie: " + title);
-                                                childSnapshot.getRef().setValue(content);
-                                                callback.onSuccess(content);
+                                                Map<String, Object> updates = new HashMap<>();
+                                                updates.put("title", title);
+                                                updates.put("description", description);
+                                                updates.put("releaseDate", releaseDate);
+                                                updates.put("rating", String.valueOf(rating));
+                                                updates.put("coverImage", coverImage);
+                                                updates.put("genresTMDB", genres);
+
+                                                childSnapshot.getRef().updateChildren(updates)
+                                                        .addOnSuccessListener(aVoid -> callback.onSuccess(existing))
+                                                        .addOnFailureListener(callback::onError);
                                             } else {
                                                 Log.d("ContentService", "Serie sin cambios: " + title);
                                                 callback.onSuccess(existing);
                                             }
+
                                             break;
                                         }
                                     }
 
                                     if (!exists) {
-                                        contentService.insertMovie(content);
-                                        Log.d("ContentService", "Serie añadida: " + title);
-                                        callback.onSuccess(content);
+                                        // Evitar sobrescribir si ya existe ese ID
+                                        reference.child(content.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if (snapshot.exists()) {
+                                                    Log.d("ContentService", "El contenido ya existía por ID, no se inserta de nuevo.");
+                                                    Content existing = snapshot.getValue(Content.class);
+                                                    callback.onSuccess(existing);
+                                                } else {
+                                                    contentService.insertMovie(content);
+                                                    Log.d("ContentService", "Contenido añadido: " + content.getTitle());
+                                                    callback.onSuccess(content);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Log.e("Firebase", "Error verificando ID: " + error.getMessage());
+                                                callback.onError(error.toException());
+                                            }
+                                        });
                                     }
+
                                 }
 
                                 @Override
@@ -386,21 +416,50 @@ public class SearchService {
 
                                             if (needsUpdate) {
                                                 Log.d("ContentService", "Actualizando película: " + title);
-                                                childSnapshot.getRef().setValue(content);
-                                                callback.onSuccess(content);
+                                                Map<String, Object> updates = new HashMap<>();
+                                                updates.put("title", title);
+                                                updates.put("description", description);
+                                                updates.put("releaseDate", releaseDate);
+                                                updates.put("rating", String.valueOf(rating));
+                                                updates.put("coverImage", coverImage);
+                                                updates.put("genresTMDB", genres);
+
+                                                childSnapshot.getRef().updateChildren(updates)
+                                                        .addOnSuccessListener(aVoid -> callback.onSuccess(existing))
+                                                        .addOnFailureListener(callback::onError);
                                             } else {
                                                 Log.d("ContentService", "Película sin cambios: " + title);
                                                 callback.onSuccess(existing);
                                             }
+
                                             break;
                                         }
                                     }
 
                                     if (!exists) {
-                                        contentService.insertMovie(content);
-                                        Log.d("ContentService", "Película añadida: " + title);
-                                        callback.onSuccess(content);
+                                        // Evitar sobrescribir si ya existe ese ID
+                                        reference.child(content.getId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                if (snapshot.exists()) {
+                                                    Log.d("ContentService", "El contenido ya existía por ID, no se inserta de nuevo.");
+                                                    Content existing = snapshot.getValue(Content.class);
+                                                    callback.onSuccess(existing);
+                                                } else {
+                                                    contentService.insertMovie(content);
+                                                    Log.d("ContentService", "Contenido añadido: " + content.getTitle());
+                                                    callback.onSuccess(content);
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Log.e("Firebase", "Error verificando ID: " + error.getMessage());
+                                                callback.onError(error.toException());
+                                            }
+                                        });
                                     }
+
                                 }
 
                                 @Override
@@ -489,17 +548,25 @@ public class SearchService {
                             public void onDataChange(@NonNull DataSnapshot snapshot) {
                                 if (!snapshot.exists()) {
                                     contentService.insertGame(content);
-
+                                    Log.d("ContentService", "Juego añadido: " + title);
+                                    callback.onSuccess(content);
                                 } else {
-                                    Log.d("ContentService", "Juego duplicado omitido: " + title);
+                                    for (DataSnapshot snap : snapshot.getChildren()) {
+                                        Content existing = snap.getValue(Content.class);
+                                        Log.d("ContentService", "Juego duplicado omitido: " + title);
+                                        callback.onSuccess(existing);
+                                        break;
+                                    }
                                 }
                             }
 
                             @Override
                             public void onCancelled(@NonNull DatabaseError error) {
                                 Log.e("Firebase", "Error buscando duplicados: " + error.getMessage());
+                                callback.onError(error.toException());
                             }
                         });
+
 
                         callback.onSuccess(content);
                     } catch (JSONException e) {
@@ -515,8 +582,23 @@ public class SearchService {
 
         String graphqlQuery = "query ($id: Int) {" +
                 " Media(id: $id, type: " + mediaType + ") {" +
-                "   id title { romaji english native } startDate { year month day } description coverImage { large }" +
-                "   siteUrl genres averageScore episodes chapters volumes format popularity } }";
+                "   id" +
+                "   title { romaji english native }" +
+                "   startDate { year month day }" +
+                "   description" +
+                "   coverImage { large }" +
+                "   siteUrl" +
+                "   genres" +
+                "   averageScore" +
+                "   episodes" +
+                "   chapters" +
+                "   volumes" +
+                "   format" +
+                "   popularity" +
+                "   studios { nodes { name } }" +
+                " }" +
+                "}";
+
 
         ContentService contentService = new ContentService(context);
 
@@ -595,6 +677,7 @@ public class SearchService {
                                     } else {
                                         for (DataSnapshot snap : snapshot.getChildren()) {
                                             Content existing = snap.getValue(Content.class);
+                                            Log.d("ContentService", "Anime ya existía: " + title);
                                             callback.onSuccess(existing);
                                             break;
                                         }
@@ -607,6 +690,7 @@ public class SearchService {
                                     callback.onError(error.toException());
                                 }
                             });
+
                         } else {
                             String categoria = format.equalsIgnoreCase("NOVEL") ? "cat_6" : "cat_5";
                             reference.orderByChild("mangaID").equalTo(id).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -621,6 +705,7 @@ public class SearchService {
                                     } else {
                                         for (DataSnapshot snap : snapshot.getChildren()) {
                                             Content existing = snap.getValue(Content.class);
+                                            Log.d("ContentService", "Manga/Novela ya existía: " + title);
                                             callback.onSuccess(existing);
                                             break;
                                         }
@@ -633,6 +718,7 @@ public class SearchService {
                                     callback.onError(error.toException());
                                 }
                             });
+
                         }
 
                     } catch (JSONException e) {

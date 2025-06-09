@@ -139,6 +139,9 @@ public class ShowsFragment extends Fragment {
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Content content = child.getValue(Content.class);
                     if (content != null && "cat_2".equals(content.getCategoryID())) {
+                        String title = content.getTitle();
+                        if (!isTitleLatin(title)) continue;
+
                         String origins = content.getOrigin();
                         if (origins != null) {
                             if (origins.contains("recent_tv")) {
@@ -153,6 +156,7 @@ public class ShowsFragment extends Fragment {
                         }
                     }
                 }
+
 
                 Collections.sort(showsList, (a, b) ->
                         Double.compare(Double.parseDouble(b.getRating()), Double.parseDouble(a.getRating())));
@@ -187,4 +191,9 @@ public class ShowsFragment extends Fragment {
         String today = new SimpleDateFormat("yyyyMMdd", Locale.getDefault()).format(new Date());
         prefs.edit().putString("last_update_date", today).apply();
     }
+
+    private boolean isTitleLatin(String title) {
+        return title != null && title.matches("^[\\p{IsLatin}\\p{IsDigit}\\p{IsPunct}\\s]+$");
+    }
+
 }

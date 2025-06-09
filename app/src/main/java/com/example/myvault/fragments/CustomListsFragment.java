@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -39,7 +40,7 @@ public class CustomListsFragment extends Fragment {
     private ListView lvCustomLists;
     private DatabaseReference reference;
     private String uidCurrentUser;
-    private Button buttonInsertCustomList;
+    private ImageButton buttonInsertCustomList;
     private CustomListService customListService;
 
 

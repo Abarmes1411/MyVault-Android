@@ -2109,6 +2109,8 @@ public class ContentService {
 
 
 
+
+
     // Llamadas a API Games
 
     public void fetchRecentGamesAndSave(Context context, Runnable onComplete) {
@@ -2481,139 +2483,6 @@ public class ContentService {
         if (onComplete != null) onComplete.run();
 
     }
-
-
-
-    // Llamadas a API Books
-
-    public void fetchPopularBooksAndSave(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences("myvault_prefs", Context.MODE_PRIVATE);
-        long lastUpdate = prefs.getLong("last_fiction_books_update", 0);
-        long now = System.currentTimeMillis();
-
-        String url = "https://www.googleapis.com/books/v1/volumes?q=subject:fiction&orderBy=newest&maxResults=40&langRestrict=es";
-
-        RequestQueue queue = Volley.newRequestQueue(context);
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
-                response -> {
-                    try {
-                        JSONArray items = response.getJSONArray("items");
-
-                        for (int i = 0; i < items.length(); i++) {
-                            JSONObject item = items.getJSONObject(i);
-                            JSONObject volumeInfo = item.getJSONObject("volumeInfo");
-
-                            String title = volumeInfo.optString("title", "Sin título");
-
-                            // FILTRO para evitar colecciones, packs o publicaciones mensuales
-                            String titleLower = title.toLowerCase();
-                            if (titleLower.contains("pack") || titleLower.contains("colection") || titleLower.contains("volume") ||
-                                    titleLower.contains("box set") || titleLower.contains("serie") ||
-                                    titleLower.contains("january") || titleLower.contains("february") || titleLower.contains("march") ||
-                                    titleLower.contains("april") || titleLower.contains("may") || titleLower.contains("june") ||
-                                    titleLower.contains("julie") || titleLower.contains("august") || titleLower.contains("september") ||
-                                    titleLower.contains("october") || titleLower.contains("november") || titleLower.contains("december")) {
-                                continue;
-                            }
-
-                            String description = volumeInfo.optString("description", "Sin descripción");
-                            String releaseDate = volumeInfo.optString("publishedDate", "Desconocida");
-
-                            // Extraer el año del publishedDate (puede venir como "2024-03-12", "2022", etc.)
-                            int publishedYear = 0;
-                            if (!releaseDate.equals("Desconocida")) {
-                                try {
-                                    publishedYear = Integer.parseInt(releaseDate.substring(0, 4));
-                                } catch (NumberFormatException | IndexOutOfBoundsException e) {
-                                    publishedYear = 0; // Si no se puede extraer bien el año
-                                }
-                            }
-
-                            // Filtrar libros publicados desde 2020 en adelante
-                            if (publishedYear < 2020) {
-                                continue;
-                            }
-
-                            String publisher = volumeInfo.optString("publisher", "Desconocido");
-                            String pages = String.valueOf(volumeInfo.optInt("pageCount", 0));
-                            String language = volumeInfo.optString("language", "es");
-
-                            List<String> authors = new ArrayList<>();
-                            JSONArray authorsArray = volumeInfo.optJSONArray("authors");
-                            if (authorsArray != null) {
-                                for (int j = 0; j < authorsArray.length(); j++) {
-                                    authors.add(authorsArray.getString(j));
-                                }
-                            }
-
-                            String coverImage = "";
-                            if (volumeInfo.has("imageLinks")) {
-                                JSONObject imageLinks = volumeInfo.getJSONObject("imageLinks");
-                                coverImage = imageLinks.optString("thumbnail", "");
-                            }
-                            if (coverImage == null || coverImage.trim().isEmpty()) {
-                                coverImage = "drawable/no_image_available.jpg";
-                            }
-
-                            JSONObject saleInfo = item.optJSONObject("saleInfo");
-                            boolean isEbook = false;
-                            String saleability = "NOT_FOR_SALE";
-                            String retailPrice = "";
-                            String currency = "";
-
-                            if (saleInfo != null) {
-                                isEbook = saleInfo.optBoolean("isEbook", false);
-                                saleability = saleInfo.optString("saleability", "NOT_FOR_SALE");
-
-                                JSONObject retailPriceObj = saleInfo.optJSONObject("retailPrice");
-                                if (retailPriceObj != null) {
-                                    retailPrice = String.valueOf(retailPriceObj.optDouble("amount", 0));
-                                    currency = retailPriceObj.optString("currencyCode", "");
-                                }
-                            }
-
-                            String bookID = item.optString("id", "");
-
-                            Content content = new Content(
-                                    "cat_2",
-                                    title,
-                                    description,
-                                    releaseDate,
-                                    coverImage,
-                                    "",
-                                    "GoogleBooks",
-                                    "popular_fiction_books_" + Calendar.getInstance().get(Calendar.YEAR),
-                                    publisher,
-                                    authors,
-                                    isEbook,
-                                    saleability,
-                                    pages,
-                                    language,
-                                    retailPrice,
-                                    currency,
-                                    bookID
-                            );
-
-                            insertBook(content);
-                        }
-
-                        prefs.edit().putLong("last_fiction_books_update", now).apply();
-
-                    } catch (JSONException e) {
-                        Log.e("BookService", "Error al procesar JSON de libros", e);
-                    }
-                },
-                error -> Log.e("BookService", "Error al obtener libros", error)
-        );
-
-        queue.add(request);
-    }
-
-
-
-
-
 
 
 }

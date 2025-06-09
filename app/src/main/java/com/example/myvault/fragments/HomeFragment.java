@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.example.myvault.R;
 import com.example.myvault.activities.LoginActivity;
@@ -22,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
  */
 public class HomeFragment extends Fragment {
 
-    private Button btnLogout, btnMoviesPage, btnShowsPage, btnGamesPage, btnAnimePage, btnMangaPage;
+    private ImageView shortcut_movies, shortcut_shows, shortcut_games, shortcut_animes, shortcut_manganovel;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -75,35 +76,49 @@ public class HomeFragment extends Fragment {
 
         view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        btnLogout = view.findViewById(R.id.btnHomeLogout);
-        btnMoviesPage = view.findViewById(R.id.btnMoviesPage);
-        btnShowsPage = view.findViewById(R.id.btnShowsPage);
-        btnGamesPage = view.findViewById(R.id.btnGamesPage);
-        btnAnimePage = view.findViewById(R.id.btnAnimePage);
-        btnMangaPage = view.findViewById(R.id.btnMangaPage);
+        shortcut_movies = view.findViewById(R.id.shortcut_movies);
+        shortcut_shows = view.findViewById(R.id.shortcut_shows);
+        shortcut_games = view.findViewById(R.id.shortcut_games);
+        shortcut_animes = view.findViewById(R.id.shortcut_animes);
+        shortcut_manganovel = view.findViewById(R.id.shortcut_manganovel);
 
 
-
-        btnLogout.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(getContext(), LoginActivity.class));
+        shortcut_movies.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.containerFrame, new MoviesFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
 
-        btnMoviesPage.setOnClickListener(v -> {
-            //startActivity(new Intent(getContext(), Movie.class));
+        shortcut_shows.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.containerFrame, new ShowsFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
-        btnShowsPage.setOnClickListener(v -> {
-            //startActivity(new Intent(getContext(), ShowsActivity.class));
+
+        shortcut_games.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.containerFrame, new GamesFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
-        btnGamesPage.setOnClickListener(v -> {
-            //startActivity(new Intent(getContext(), GamesActivity.class));
+
+        shortcut_animes.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.containerFrame, new AnimesFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
-        btnAnimePage.setOnClickListener(v -> {
-            //startActivity(new Intent(getContext(), AnimesActivity.class));
+
+        shortcut_manganovel.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.containerFrame, new MangasFragment())
+                    .addToBackStack(null)
+                    .commit();
         });
-        btnMangaPage.setOnClickListener(v -> {
-            //startActivity(new Intent(getContext(), MangaActivity.class));
-        });
+
+
         // Inflate the layout for this fragment
         return view;
     }

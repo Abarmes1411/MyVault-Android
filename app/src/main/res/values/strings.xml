@@ -12,7 +12,6 @@
     <string name="save">Guardar</string>
     <string name="cancel">Cancelar</string>
     <string name="delete">Eliminar</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="deepl_api_key">92c7bb31-4661-4c18-b67d-2afbb75f73c1:fx</string>
 
 </resources>

@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -29,7 +30,7 @@ public class FriendsFragment extends Fragment {
 
     private View view;
     private ListView lvFriendsList;
-    private Button buttonAddFriend;
+    private ImageButton buttonAddFriend;
     private FriendsAdapter adapter;
     private List<User> userList;
 

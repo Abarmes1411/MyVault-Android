@@ -17,5 +17,24 @@ public enum Categories {
     public String getId() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        String name = this.name();
+
+        String[] parts = name.split("_");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < parts.length; i++) {
+            String part = parts[i].toLowerCase();
+            part = part.substring(0, 1).toUpperCase() + part.substring(1);
+            result.append(part);
+            if (i < parts.length - 1) {
+                result.append(" ");
+            }
+        }
+
+        return result.toString();
+    }
 }
 

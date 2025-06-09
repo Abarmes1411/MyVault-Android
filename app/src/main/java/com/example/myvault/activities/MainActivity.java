@@ -1,6 +1,7 @@
 package com.example.myvault.activities;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.graphics.Insets;
 import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
@@ -55,9 +57,9 @@ public class MainActivity extends AppCompatActivity {
     private NavigationView lateral_view;
     private Fragment selectedFragment;
     private TextView tvHeader, tvMyVault;
-    private ImageButton lvBack;
     private BottomNavigationView bottomMenu;
     private DatabaseReference reference;
+    private ImageView ivProfileImage;
 
 
 
@@ -66,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -88,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
 
                         tvHeader.setText(user.getUsername());
 
-
                     }
                 }
             }
@@ -110,9 +113,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        lvBack.setOnClickListener(v -> {
-            lateral_view.setVisibility(View.GONE);
-        });
 
         searchButton.setOnClickListener(v -> {
             searchButton.setSelected(!searchButton.isSelected());
@@ -243,10 +243,10 @@ public class MainActivity extends AppCompatActivity {
 
         arrowUp.setVisibility(View.GONE);
         View view = lateral_view.getHeaderView(0);
-        tvHeader = view.findViewById(R.id.tvHeader);
+        tvHeader = view.findViewById(R.id.tvUserName);
         tvMyVault = findViewById(R.id.tvMyVault);
-        lvBack = view.findViewById(R.id.btnBack);
         bottomMenu = findViewById(R.id.bottom_menu);
+        ivProfileImage = view.findViewById(R.id.ivProfileImage);
 
     }
 }

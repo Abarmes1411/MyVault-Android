@@ -100,6 +100,15 @@ public class MyVaultFragment extends Fragment {
         adapterMangas = new DetailListAdapter(contentMangas, requireContext(), item -> openDetailActivity(item));
         adapterNovels = new DetailListAdapter(contentNovels, requireContext(), item -> openDetailActivity(item));
 
+
+        adapterMovies.setOnItemLongClickListener(item -> showDeleteDialog(item, contentMovies, adapterMovies));
+        adapterSeries.setOnItemLongClickListener(item -> showDeleteDialog(item, contentSeries, adapterSeries));
+        adapterGames.setOnItemLongClickListener(item -> showDeleteDialog(item, contentGames, adapterGames));
+        adapterAnimes.setOnItemLongClickListener(item -> showDeleteDialog(item, contentAnimes, adapterAnimes));
+        adapterMangas.setOnItemLongClickListener(item -> showDeleteDialog(item, contentMangas, adapterMangas));
+        adapterNovels.setOnItemLongClickListener(item -> showDeleteDialog(item, contentNovels, adapterNovels));
+
+
         // Asignar adapters vacíos con sus respectivas listas
         rvMovies.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         rvMovies.setAdapter(adapterMovies);
@@ -312,6 +321,42 @@ public class MyVaultFragment extends Fragment {
 
         startActivity(intent);
     }
+
+    private void showDeleteDialog(Content item, List<Content> contentList, DetailListAdapter adapter) {
+        new androidx.appcompat.app.AlertDialog.Builder(requireContext())
+                .setTitle("Eliminar contenido")
+                .setMessage("¿Quieres eliminar \"" + item.getTitle() + "\" de tu vault?")
+                .setPositiveButton("Sí", (dialog, which) -> deleteItemFromVault(item, contentList, adapter))
+                .setNegativeButton("No", null)
+                .show();
+    }
+
+    private void deleteItemFromVault(Content item, List<Content> contentList, DetailListAdapter adapter) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference vaultRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid)
+                .child("myVault");
+
+        vaultRef.get().addOnSuccessListener(snapshot -> {
+            for (DataSnapshot child : snapshot.getChildren()) {
+                String contentId = child.getValue(String.class);
+                if (contentId != null && contentId.equals(item.getId())) { // aquí usa el campo que identifique único el contenido
+                    // eliminar la entrada del vault
+                    child.getRef().removeValue().addOnSuccessListener(aVoid -> {
+                        contentList.remove(item);
+                        adapter.notifyDataSetChanged();
+                        checkIfEmpty();
+                    }).addOnFailureListener(e -> {
+                        // manejar error
+                        Log.e("deleteItemFromVault", "Error al eliminar item", e);
+                    });
+                    break;
+                }
+            }
+        }).addOnFailureListener(e -> Log.e("deleteItemFromVault", "Error al leer vault", e));
+    }
+
 
 
 }

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.OnItemClic
     private ProgressBar progressBar;
     private RecyclerView rvSearch;
     private SearchAdapter adapter;
+    private TextView tvWait;
 
     private List<Content> allResults = new ArrayList<>();
     private DatabaseReference firebaseRef;
@@ -52,6 +54,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.OnItemClic
         btnSearch = view.findViewById(R.id.btnSearch);
         progressBar = view.findViewById(R.id.progressBarSearch);
         rvSearch = view.findViewById(R.id.rvSearch);
+        tvWait = view.findViewById(R.id.tvWait);
         rvSearch.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         firebaseRef = FirebaseDatabase.getInstance().getReference("content");
@@ -86,6 +89,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.OnItemClic
             @Override
             public void onSuccess(List<Content> results) {
                 progressBar.setVisibility(View.GONE);
+                tvWait.setVisibility(View.GONE);
                 allResults.addAll(results);
                 adapter.notifyDataSetChanged();
             }
@@ -93,6 +97,7 @@ public class SearchFragment extends Fragment implements SearchAdapter.OnItemClic
             @Override
             public void onError(Exception e) {
                 progressBar.setVisibility(View.GONE);
+                tvWait.setVisibility(View.GONE);
                 Toast.makeText(getContext(), "Error en búsqueda: " + e.getMessage(), Toast.LENGTH_LONG).show();
             }
         }, getContext());

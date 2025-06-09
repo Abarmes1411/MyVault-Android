@@ -26,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -133,20 +134,37 @@ public class MoviesFragment extends Fragment {
                 popularMoviesList.clear();
                 upcomingMoviesList.clear();
 
+                List<Content> tempPopular = new ArrayList<>();
+
                 for (DataSnapshot child : snapshot.getChildren()) {
                     Content content = child.getValue(Content.class);
                     if (content != null && "cat_1".equals(content.getCategoryID())) {
                         String origins = content.getOrigin();
                         if (origins != null) {
                             if (origins.contains("recent")) movieList.add(content);
-                            if (origins.contains("popular")) popularMoviesList.add(content);
+                            if (origins.contains("popular")) tempPopular.add(content);
                             if (origins.contains("upcoming")) upcomingMoviesList.add(content);
                         }
                     }
                 }
 
+                // Ordenar por rating descendente
                 Collections.sort(movieList, (m1, m2) -> Double.compare(Double.parseDouble(m2.getRating()), Double.parseDouble(m1.getRating())));
-                Collections.sort(popularMoviesList, (m1, m2) -> Double.compare(Double.parseDouble(m2.getRating()), Double.parseDouble(m1.getRating())));
+
+                // Ordenar populares por fecha de estreno descendente
+                Collections.sort(tempPopular, (m1, m2) -> {
+                    try {
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                        Date d1 = df.parse(m1.getReleaseDate());
+                        Date d2 = df.parse(m2.getReleaseDate());
+                        return d2.compareTo(d1);
+                    } catch (Exception e) {
+                        return 0;
+                    }
+                });
+
+                // Limitar a máximo 20 películas populares
+                popularMoviesList.addAll(tempPopular.subList(0, Math.min(20, tempPopular.size())));
 
                 adapter.notifyDataSetChanged();
                 popularAdapter.notifyDataSetChanged();
@@ -154,7 +172,6 @@ public class MoviesFragment extends Fragment {
 
                 progressBar.setVisibility(View.GONE);
                 mainContent.setVisibility(View.VISIBLE);
-
             }
 
             @Override
@@ -163,6 +180,7 @@ public class MoviesFragment extends Fragment {
             }
         });
     }
+
 
     private boolean shouldUpdateToday() {
         SharedPreferences prefs = requireContext().getSharedPreferences("prefs_movies", Context.MODE_PRIVATE);

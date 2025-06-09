@@ -15,5 +15,6 @@
     <color name="tab_active_color">#FF6200EE</color>
     <color name="tab_inactive_color">#FFAAAAAA</color>
     <color name="tab_inactive_border">#FFCCCCCC</color>
+    <color name="light_blue">#6CA8D6</color>
 
 </resources>

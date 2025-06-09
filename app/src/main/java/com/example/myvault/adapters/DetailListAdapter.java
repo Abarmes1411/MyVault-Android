@@ -24,10 +24,24 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.De
 
     private DetailListAdapter.OnItemClickListener listener;
 
+    private OnItemLongClickListener longClickListener;
+
     public DetailListAdapter(List<Content> movieList, Context context, DetailListAdapter.OnItemClickListener listener) {
         this.detailList = movieList;
         this.context = context;
         this.listener = listener;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Content item);
+    }
+
+    public interface OnItemLongClickListener {
+        void onItemLongClick(Content item);
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener longClickListener) {
+        this.longClickListener = longClickListener;
     }
 
 
@@ -39,24 +53,31 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.De
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DetailListAdapter.DetailListViewHolder holder, int position) {
-
-        Calendar calendar = Calendar.getInstance();
-        int month = calendar.get(Calendar.MONTH);
+    public void onBindViewHolder(@NonNull DetailListViewHolder holder, int position) {
 
         Content detail = detailList.get(position);
         holder.tvTitle.setText(detail.getTitle());
-
         holder.tvDate.setText(detail.getReleaseDate());
 
         Picasso.get().load(detail.getCoverImage()).into(holder.ivCover);
+
+        // Click normal
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onItemClick(detailList.get(holder.getAdapterPosition()));
+                listener.onItemClick(detail);
             }
         });
 
+        // Click largo
+        holder.itemView.setOnLongClickListener(v -> {
+            if (longClickListener != null) {
+                longClickListener.onItemLongClick(detail);
+                return true;
+            }
+            return false;
+        });
     }
+
 
     @Override
     public int getItemCount() {
@@ -73,10 +94,6 @@ public class DetailListAdapter extends RecyclerView.Adapter<DetailListAdapter.De
             tvTitle = itemView.findViewById(R.id.tvTitle);
             tvDate = itemView.findViewById(R.id.tvDate);
         }
-    }
-
-    public interface OnItemClickListener {
-        void onItemClick(Content content);
     }
 
 }
