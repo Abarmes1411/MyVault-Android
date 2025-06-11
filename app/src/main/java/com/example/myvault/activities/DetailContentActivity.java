@@ -44,6 +44,7 @@ import com.example.myvault.models.Content;
 import com.example.myvault.models.ReviewWithUserAUX;
 import com.example.myvault.models.User;
 import com.example.myvault.models.UserReview;
+import com.example.myvault.services.AiServices;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -56,6 +57,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -64,10 +66,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import okhttp3.*;
+import org.json.JSONObject;
+
 public class DetailContentActivity extends AppCompatActivity {
 
     private ImageView ivCover, star1, star2, star3, star4, star5;
-    private TextView tvTitle, tvOriginalTitle, tvDescription, tvReleaseDate, tvGenres, tvOriginalRating, tvContentOrigin, tvAIReview, tvPlatforms, tvWebsite, tvDevelopers, tvEpisodes, tvStudios;
+    private TextView tvTitle, tvOriginalTitle, tvDescription, tvAIOpinion, tvReleaseDate, tvGenres, tvOriginalRating, tvContentOrigin, tvAIReview, tvPlatforms, tvWebsite, tvDevelopers, tvEpisodes, tvStudios;
     private Button btnAddUserReview, btnAddList, btnAddVault;
     private Content content;
     private ListView lvUserReview;
@@ -153,6 +158,7 @@ public class DetailContentActivity extends AppCompatActivity {
         tvGenres = findViewById(R.id.tvGenres);
         tvOriginalRating = findViewById(R.id.tvOriginalRating);
         tvContentOrigin = findViewById(R.id.tvContentOrigin);
+        tvAIOpinion = findViewById(R.id.tvAIOpinion);
         tvAIReview = findViewById(R.id.tvAIReview);
         btnAddUserReview = findViewById(R.id.btnAddUserReview);
         tvPlatforms = findViewById(R.id.tvPlatforms);
@@ -163,8 +169,6 @@ public class DetailContentActivity extends AppCompatActivity {
         lvUserReview = findViewById(R.id.lvUserReview);
         btnAddList = findViewById(R.id.btnAddList);
         btnAddVault = findViewById(R.id.btnAddVault);
-
-
 
 
 
@@ -196,6 +200,8 @@ public class DetailContentActivity extends AppCompatActivity {
             tvReleaseDate.setText(boldLabel("Fecha de Salida: ", content.getReleaseDate()));
 
         }
+
+        tvAIOpinion.setText(boldLabel("Opinión General:", ""));
         String ratingStr = content.getRating();
         double rating = 0.0;
 
@@ -643,6 +649,12 @@ public class DetailContentActivity extends AppCompatActivity {
                                             loadDB(contentKey);
 
 
+                                            TextView tvAIReview = findViewById(R.id.tvAIReview);
+
+                                            AiServices summaryManager = new AiServices(contentKey, tvAIReview);
+                                            summaryManager.loadAndGenerateSummary();
+
+
                                             progressBar.setVisibility(View.GONE);
                                             detailContentRoot.setVisibility(View.VISIBLE);
 
@@ -660,6 +672,9 @@ public class DetailContentActivity extends AppCompatActivity {
                                 loadUserReviewsAndDisplayStars(contentKey);
                                 loadDB(contentKey);
 
+
+
+
                                 progressBar.setVisibility(View.GONE);
                                 detailContentRoot.setVisibility(View.VISIBLE);
                                 break;
@@ -675,7 +690,6 @@ public class DetailContentActivity extends AppCompatActivity {
                     }
                 });
     }
-
 
 
     private String cleanDescription(String rawDescription) {
@@ -733,12 +747,6 @@ public class DetailContentActivity extends AppCompatActivity {
         String lower = texto.toLowerCase();
         return lower.contains("the ") || lower.contains("is ") || lower.contains("with ") || lower.contains("a ") || lower.contains("in ");
     }
-
-
-
-
-
-
 
 
     // Géneros de películas

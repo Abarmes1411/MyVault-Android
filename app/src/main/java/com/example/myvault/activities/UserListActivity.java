@@ -1,7 +1,10 @@
 package com.example.myvault.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import androidx.activity.EdgeToEdge;
@@ -13,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.myvault.R;
 import com.example.myvault.adapters.UserListAdapter;
 import com.example.myvault.enums.Mode;
+import com.example.myvault.fragments.FriendsFragment;
 import com.example.myvault.models.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -29,6 +33,7 @@ public class UserListActivity extends AppCompatActivity {
     private ListView lvUserlist;
     private List<User> userList = new ArrayList<>();
     private UserListAdapter adapter;
+    private ImageButton buttonBack;
 
 
     @Override
@@ -44,13 +49,16 @@ public class UserListActivity extends AppCompatActivity {
 
         loadComponents();
 
+        buttonBack.setOnClickListener(view -> {
+            finish();
+        });
 
     }
 
 
     private void loadComponents(){
         lvUserlist = findViewById(R.id.lvUserlist);
-
+        buttonBack = findViewById(R.id.buttonBack);
         lvUserlist = findViewById(R.id.lvUserlist);
         adapter = new UserListAdapter(this, userList, Mode.DEFAULT);
         lvUserlist.setAdapter(adapter);

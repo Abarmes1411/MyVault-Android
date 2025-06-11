@@ -13,5 +13,7 @@
     <string name="cancel">Cancelar</string>
     <string name="delete">Eliminar</string>
     <string name="deepl_api_key">92c7bb31-4661-4c18-b67d-2afbb75f73c1:fx</string>
+    <string name="openai_api_key">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</string>
+
 
 </resources>

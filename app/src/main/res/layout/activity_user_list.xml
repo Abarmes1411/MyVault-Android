@@ -13,14 +13,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
+    <ImageButton
         android:id="@+id/buttonBack"
-        android:layout_width="70dp"
+        android:layout_width="62dp"
         android:layout_height="70dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        android:backgroundTint="@color/green"
-        android:text="Volver"
-         />
+        android:background="@drawable/rounded_blue_button"
+        android:elevation="6dp"
+        android:padding="16dp"
+        android:scaleType="center"
+        android:src="@drawable/ic_arrow_back" />
 
 </FrameLayout>

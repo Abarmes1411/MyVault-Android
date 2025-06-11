@@ -54,20 +54,11 @@ public class InsertOrEditUser extends AppCompatActivity {
         loadComponents();
 
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        if(currentUser != null){
-            etName.setText(currentUser.getDisplayName());
-            etEmail.setText(currentUser.getEmail());
-            etPassword.setVisibility(View.GONE);
-            etEmail.setEnabled(true);
-
-        }
-
 
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(InsertOrEditUser.this, MainActivity.class);
+                Intent intent = new Intent(InsertOrEditUser.this, LoginActivity.class);
 
                 startActivity(intent);
             }
@@ -88,15 +79,19 @@ public class InsertOrEditUser extends AppCompatActivity {
                                     @Override
                                     public void onComplete(@NonNull Task<AuthResult> task) {
                                         if (task.isSuccessful()) {
-
+                                            FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+                                            if (currentUser != null) {
                                                 createUser();
                                                 Toast.makeText(InsertOrEditUser.this, "¡Bienvenido a myVault!", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Toast.makeText(InsertOrEditUser.this, "Error inesperado: usuario no autenticado tras crear cuenta.", Toast.LENGTH_SHORT).show();
+                                            }
                                         } else {
-                                            Toast.makeText(InsertOrEditUser.this, "Error al crear el usuario", Toast.LENGTH_SHORT)
-                                                    .show();
+                                            Toast.makeText(InsertOrEditUser.this, "Error al crear el usuario", Toast.LENGTH_SHORT).show();
                                         }
                                     }
                                 });
+
                     } else {
 
                             createUser();

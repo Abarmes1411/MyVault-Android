@@ -58,6 +58,9 @@ dependencies {
     implementation ("com.google.firebase:firebase-firestore:24.10.0")
     implementation ("com.google.android.flexbox:flexbox:3.0.0")
     implementation("com.google.firebase:firebase-storage")
+    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation ("org.json:json:20240303")
+
 
 
 

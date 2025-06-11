@@ -1,5 +1,7 @@
 package com.example.myvault.activities;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -91,7 +93,15 @@ public class MainActivity extends AppCompatActivity {
 
 
                         tvHeader.setText(user.getUsername());
-
+                        if (user.getProfilePic() != null) {
+                            String resourceName = user.getProfilePic().replace(".png", "");
+                            int imageResId = getResources().getIdentifier(resourceName, "drawable", getPackageName());
+                            if (imageResId != 0) {
+                                ivProfileImage.setImageResource(imageResId);
+                            } else {
+                                ivProfileImage.setImageResource(R.drawable.movie_profile_pic);
+                            }
+                        }
                     }
                 }
             }
@@ -120,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             if (searchButton.isSelected()) {
                 arrowDown.setVisibility(View.GONE);
                 arrowUp.setVisibility(View.VISIBLE);
+                tvMyVault.setText("Buscar Contenido...");
 
                 selectedFragment = new SearchFragment();
                 getSupportFragmentManager().beginTransaction()
@@ -158,23 +169,22 @@ public class MainActivity extends AppCompatActivity {
             } else if (id == R.id.logout_title) {
                 FirebaseAuth.getInstance().signOut();
                 startActivity(new Intent(this, LoginActivity.class));
+                return true;
             } else if (id == R.id.your_reviews_title) {
                 selectedFragment = new UserReviewsFragment();
                 tvMyVault.setText("Reseñas");
-            }else if (id == R.id.settings_title) {
-                selectedFragment = new SettingsFragment();
-                tvMyVault.setText("Configuración");
-
             }else if (id == R.id.requests_title) {
                 selectedFragment = new RequestsFragment();
                 tvMyVault.setText("Peticiones de Amistad");
             }
 
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.containerFrame, selectedFragment)
-                    .addToBackStack(null)
-                    .commit();
+            if (selectedFragment != null) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.containerFrame, selectedFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
 
             bottomMenu.getMenu().setGroupCheckable(0, true, false);
             for (int i = 0; i < bottomMenu.getMenu().size(); i++) {

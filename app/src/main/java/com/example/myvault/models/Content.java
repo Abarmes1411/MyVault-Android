@@ -29,17 +29,6 @@ public class Content extends DomainEntity implements Serializable {
     private String tmdbTVID;
     private List<String> genresTVTMDB;
 
-    // Atributos para libros
-    private String bookID;
-    private String publisher;
-    private List<String> authors;
-    private boolean isEbook;
-    private String saleability;
-    private String pages;
-    private String language;
-    private String retailPrice;
-    private String currency;
-
     // Atributos para juegos
     private String gameID;
     private List<String> platforms;
@@ -154,28 +143,6 @@ public class Content extends DomainEntity implements Serializable {
         this.developers = developers;
         this.added = added;
         this.gameID = gameID;
-    }
-
-
-    // Constructor para libros
-    public Content(String categoryID, String title, String description, String releaseDate, String coverImage, String rating, String source, String origin, String publisher, List<String> authors, boolean isEbook, String saleability, String pages, String language, String retailPrice, String currency, String bookID) {
-        this.categoryID = categoryID;
-        this.title = title;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.coverImage = coverImage;
-        this.rating = rating;
-        this.source = source;
-        this.origin = origin;
-        this.publisher = publisher;
-        this.authors = authors;
-        this.isEbook = isEbook;
-        this.saleability = saleability;
-        this.pages = pages;
-        this.language = language;
-        this.retailPrice = retailPrice;
-        this.currency = currency;
-        this.bookID = bookID;
     }
 
 
@@ -344,69 +311,6 @@ public class Content extends DomainEntity implements Serializable {
         this.added = added;
     }
 
-    public String getPublisher() {
-        return publisher;
-    }
-
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
-    }
-
-    public List<String> getAuthors() {
-        return authors;
-    }
-
-    public void setAuthors(List<String> authors) {
-        this.authors = authors;
-    }
-
-    public boolean isEbook() {
-        return isEbook;
-    }
-
-    public void setEbook(boolean ebook) {
-        isEbook = ebook;
-    }
-
-    public String getSaleability() {
-        return saleability;
-    }
-
-    public void setSaleability(String saleability) {
-        this.saleability = saleability;
-    }
-
-    public String getPages() {
-        return pages;
-    }
-
-    public void setPages(String pages) {
-        this.pages = pages;
-    }
-
-    public String getLanguage() {
-        return language;
-    }
-
-    public void setLanguage(String language) {
-        this.language = language;
-    }
-
-    public String getRetailPrice() {
-        return retailPrice;
-    }
-
-    public void setRetailPrice(String retailPrice) {
-        this.retailPrice = retailPrice;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
 
     public List<String> getGenresTVTMDB() {
         return genresTVTMDB;
@@ -440,15 +344,6 @@ public class Content extends DomainEntity implements Serializable {
                 ", genresTMDB=" + genresTMDB +
                 ", tmdbTVID='" + tmdbTVID + '\'' +
                 ", genresTVTMDB=" + genresTVTMDB +
-                ", bookID='" + bookID + '\'' +
-                ", publisher='" + publisher + '\'' +
-                ", authors=" + authors +
-                ", isEbook=" + isEbook +
-                ", saleability='" + saleability + '\'' +
-                ", pages='" + pages + '\'' +
-                ", language='" + language + '\'' +
-                ", retailPrice='" + retailPrice + '\'' +
-                ", currency='" + currency + '\'' +
                 ", gameID='" + gameID + '\'' +
                 ", platforms=" + platforms +
                 ", website='" + website + '\'' +
@@ -474,14 +369,6 @@ public class Content extends DomainEntity implements Serializable {
 
     public void setTmdbID(String tmdbID) {
         this.tmdbID = tmdbID;
-    }
-
-    public String getBookID() {
-        return bookID;
-    }
-
-    public void setBookID(String bookID) {
-        this.bookID = bookID;
     }
 
     public String getGameID() {

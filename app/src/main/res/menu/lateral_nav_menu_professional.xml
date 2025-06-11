@@ -34,9 +34,6 @@
     </group>
 
     <group android:id="@+id/group_settings">
-        <item android:title="Configuración"
-            android:id="@+id/settings_title"
-            android:icon="@drawable/ic_settings" />
 
         <item android:title="Cerrar Sesión"
             android:id="@+id/logout_title"

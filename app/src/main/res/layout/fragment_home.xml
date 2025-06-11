@@ -10,181 +10,162 @@
         android:layout_height="wrap_content"
         android:padding="16dp">
 
-        <!-- Saludo o mensaje de bienvenida -->
-        <TextView
-            android:id="@+id/tvWelcome"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="¡Bienvenido de nuevo!"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:gravity="center"/>
-
-        <!-- Imagen destacada (puede usarse para banner o imagen de usuario) -->
-        <ImageView
-            android:id="@+id/imgBanner"
-            android:layout_width="0dp"
-            android:layout_height="190dp"
-            android:adjustViewBounds="true"
-            android:scaleType="center"
-            android:src="@drawable/logo_4_2_1"
-            app:layout_constraintTop_toBottomOf="@id/tvWelcome"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="16dp"/>
-
-
-        <!-- Botones de acceso rápido -->
         <LinearLayout
-            android:id="@+id/quickAccess"
+            android:id="@+id/mainContent"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/imgBanner"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <!-- Saludo -->
+            <TextView
+                android:id="@+id/tvWelcome"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:text="¡Bienvenido de nuevo!"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:gravity="center" />
+
+            <!-- Imagen destacada -->
+            <ImageView
+                android:id="@+id/imgBanner"
+                android:layout_width="match_parent"
+                android:layout_height="190dp"
+                android:adjustViewBounds="true"
+                android:scaleType="center"
+                android:src="@drawable/logo_4_2_1"
+                android:layout_marginTop="16dp" />
+
+            <!-- Botones de acceso rápido -->
+            <LinearLayout
+                android:id="@+id/quickAccess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
                 android:gravity="center"
-                android:padding="8dp">
+                android:layout_marginTop="16dp">
 
-                <ImageView
-                    android:id="@+id/shortcut_movies"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@drawable/movie"
-                    android:background="@drawable/circle_background_home"
-                    android:padding="12dp" />
-
-                <TextView
+                <!-- Películas -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Películas"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp">
+                    <ImageView
+                        android:id="@+id/shortcut_movies"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/movie"
+                        android:background="@drawable/circle_background_home"
+                        android:padding="12dp" />
 
-                <ImageView
-                    android:id="@+id/shortcut_shows"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@drawable/show"
-                    android:background="@drawable/circle_background_home"
-                    android:padding="12dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Películas"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
-                <TextView
+                <!-- Series -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Series"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp">
+                    <ImageView
+                        android:id="@+id/shortcut_shows"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/show"
+                        android:background="@drawable/circle_background_home"
+                        android:padding="12dp" />
 
-                <ImageView
-                    android:id="@+id/shortcut_games"
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Series"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@drawable/game"
-                    android:background="@drawable/circle_background_home"
-                    android:padding="12dp" />
-
-                <TextView
+                <!-- Juegos -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Juegos"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp">
+                    <ImageView
+                        android:id="@+id/shortcut_games"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/game"
+                        android:background="@drawable/circle_background_home"
+                        android:padding="12dp" />
 
-                <ImageView
-                    android:id="@+id/shortcut_animes"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@drawable/ic_anime"
-                    android:background="@drawable/circle_background_home"
-                    android:padding="12dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Juegos"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
-                <TextView
+                <!-- Animes -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Animes"
-                    android:textSize="12sp"/>
-            </LinearLayout>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="8dp">
+                    <ImageView
+                        android:id="@+id/shortcut_animes"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_anime"
+                        android:background="@drawable/circle_background_home"
+                        android:padding="12dp" />
 
-                <ImageView
-                    android:id="@+id/shortcut_manganovel"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:src="@drawable/manga_novel"
-                    android:background="@drawable/circle_background_home"
-                    android:padding="12dp" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Animes"
+                        android:textSize="12sp" />
+                </LinearLayout>
 
-                <TextView
+                <!-- Mangas y Novelas -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mangas y Novelas"
-                    android:textAlignment="center"
-                    android:textSize="12sp"/>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:id="@+id/shortcut_manganovel"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/manga_novel"
+                        android:background="@drawable/circle_background_home"
+                        android:padding="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mangas y Novelas"
+                        android:textAlignment="center"
+                        android:textSize="12sp" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
-
-        <!-- Texto o sección destacada -->
-        <TextView
-            android:id="@+id/tvHighlights"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Lo más visto esta semana"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@id/quickAccess"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
-
-        <!-- Frame para cargar contenido dinámico -->
-        <FrameLayout
-            android:id="@+id/containerFrame"
-            android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:layout_marginTop="12dp"
-            app:layout_constraintTop_toBottomOf="@id/tvHighlights"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:padding="12dp"/>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
