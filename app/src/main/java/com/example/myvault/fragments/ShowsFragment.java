@@ -24,6 +24,7 @@ import com.example.myvault.activities.DetailContentActivity;
 import com.example.myvault.adapters.ShowAdapter;
 import com.example.myvault.models.Content;
 import com.example.myvault.services.ContentService;
+import com.example.myvault.services.ShowsService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -48,6 +49,7 @@ public class ShowsFragment extends Fragment {
     private List<Content> upcomingShowsList = new ArrayList<>();
     private DatabaseReference dbRef;
     private ContentService contentService;
+    private ShowsService showsService;
     private View mainContent;
     private View progressBar;
 
@@ -110,12 +112,13 @@ public class ShowsFragment extends Fragment {
         rvPopularShows.setAdapter(popularAdapter);
         rvUpcomingShows.setAdapter(upcomingAdapter);
 
-        contentService = new ContentService(getContext());
+        showsService = new ShowsService(getContext());
+
         if (shouldUpdateToday()) {
             Log.d("ShowsFragment", "Actualizando datos...");
-            contentService.fetchRecentShowsAndSave(requireContext(), () -> {
-                contentService.fetchPopularShowsAndSave(requireContext(), () -> {
-                    contentService.fetchUpcomingShowsAndSave(requireContext(), () -> {
+            showsService.fetchRecentShowsAndSave(requireContext(), () -> {
+                showsService.fetchPopularShowsAndSave(requireContext(), () -> {
+                    showsService.fetchUpcomingShowsAndSave(requireContext(), () -> {
                         saveUpdateDate();
                         loadDB();
                     });

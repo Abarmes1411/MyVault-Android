@@ -23,6 +23,8 @@ import com.example.myvault.activities.DetailContentActivity;
 import com.example.myvault.adapters.MangaAdapter;
 import com.example.myvault.models.Content;
 import com.example.myvault.services.ContentService;
+import com.example.myvault.services.MangasService;
+import com.example.myvault.services.NovelService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,6 +54,8 @@ public class MangasFragment extends Fragment {
 
     private DatabaseReference dbRef;
     private ContentService contentService;
+    private MangasService mangasService;
+    private NovelService novelService;
     private View mainContentManga;
     private View progressBarManga;
     private View progressBarNovel;
@@ -124,12 +128,15 @@ public class MangasFragment extends Fragment {
         rvBestMangasYearlyNovel.setAdapter(adapterBestYearlyNovel);
 
         contentService = new ContentService(getContext());
+        mangasService = new MangasService(getContext());
+        novelService = new NovelService(getContext());
+
 
         if (shouldUpdateTodayManga()) {
             Log.d("MangaFragment", "Actualizando datos de mangas...");
-            contentService.fetchNewsMangasAndSave(requireContext(), () -> {
-                contentService.fetchTopOngoingMangasAndSave(requireContext(), () -> {
-                    contentService.fetchBestMangaYearlyAndSave(requireContext(), () -> {
+            mangasService.fetchNewsMangasAndSave(requireContext(), () -> {
+                mangasService.fetchTopOngoingMangasAndSave(requireContext(), () -> {
+                    mangasService.fetchBestMangaYearlyAndSave(requireContext(), () -> {
                         saveUpdateDateManga();
                         loadMangaData();
                     });
@@ -174,9 +181,9 @@ public class MangasFragment extends Fragment {
 
             if (shouldUpdateTodayNovels()) {
                 Log.d("MangaFragment", "Actualizando datos de novelas...");
-                contentService.fetchNewsNovelsAndSave(requireContext(), () -> {
-                    contentService.fetchTopOngoingNovelsAndSave(requireContext(), () -> {
-                        contentService.fetchBestLightNovelsYearlyAndSave(requireContext(), () -> {
+                novelService.fetchNewsNovelsAndSave(requireContext(), () -> {
+                    novelService.fetchTopOngoingNovelsAndSave(requireContext(), () -> {
+                        novelService.fetchBestLightNovelsYearlyAndSave(requireContext(), () -> {
                             saveUpdateDateNovels();
                             loadNovelData();
                         });

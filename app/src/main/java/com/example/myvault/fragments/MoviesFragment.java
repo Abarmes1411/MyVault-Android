@@ -20,6 +20,7 @@ import com.example.myvault.activities.DetailContentActivity;
 import com.example.myvault.adapters.MovieAdapter;
 import com.example.myvault.models.Content;
 import com.example.myvault.services.ContentService;
+import com.example.myvault.services.MoviesService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,6 +46,7 @@ public class MoviesFragment extends Fragment {
     private List<Content> upcomingMoviesList = new ArrayList<>();
     private DatabaseReference dbRef;
     private ContentService contentService;
+    private MoviesService moviesService;
     private View mainContent;
     private View progressBar;
 
@@ -107,12 +109,12 @@ public class MoviesFragment extends Fragment {
         rvPopularMovies.setAdapter(popularAdapter);
         rvUpcomingMovies.setAdapter(upcomingAdapter);
 
-        contentService = new ContentService(requireContext());
+        moviesService = new MoviesService(getContext());
         if (shouldUpdateToday()) {
             Log.d("MoviesFragment", "Actualizando datos...");
-            contentService.fetchRecentMoviesAndSave(requireContext(), () -> {
-                contentService.fetchPopularMoviesAndSave(requireContext(), () -> {
-                    contentService.fetchUpcomingMoviesAndSave(requireContext(), () -> {
+            moviesService.fetchRecentMoviesAndSave(requireContext(), () -> {
+                moviesService.fetchPopularMoviesAndSave(requireContext(), () -> {
+                    moviesService.fetchUpcomingMoviesAndSave(requireContext(), () -> {
                         saveUpdateDate();
                         loadDB();
                     });

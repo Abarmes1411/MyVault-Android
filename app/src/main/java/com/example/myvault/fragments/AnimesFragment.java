@@ -20,6 +20,7 @@ import com.example.myvault.R;
 import com.example.myvault.activities.DetailContentActivity;
 import com.example.myvault.adapters.AnimesAdapter;
 import com.example.myvault.models.Content;
+import com.example.myvault.services.AnimeService;
 import com.example.myvault.services.ContentService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -47,6 +48,7 @@ public class AnimesFragment extends Fragment {
     private List<Content> bestAnimesYearlyList = new ArrayList<>();
     private DatabaseReference dbRef;
     private ContentService contentService;
+    private AnimeService animeService;
     private View mainContent;
     private View progressBar;
 
@@ -125,14 +127,15 @@ public class AnimesFragment extends Fragment {
         tvSeasonedAnimes.setText("Temporada de " + season);
 
         contentService = new ContentService(getContext());
+        animeService = new AnimeService(getContext());
 
         progressBar.setVisibility(View.VISIBLE);
 
         if (shouldUpdateToday()) {
             Log.d("GamesFragment", "Actualizando datos...");
-            contentService.fetchSeasonedAnimeAndSave(requireContext(), () -> {
-                contentService.fetchPopularAnimeAndSave(requireContext(), () -> {
-                    contentService.fetchBestAnimeYearlyAndSave(requireContext(), () -> {
+            animeService.fetchSeasonedAnimeAndSave(requireContext(), () -> {
+                animeService.fetchPopularAnimeAndSave(requireContext(), () -> {
+                    animeService.fetchBestAnimeYearlyAndSave(requireContext(), () -> {
                         saveUpdateDate();
                         loadDB();
                     });

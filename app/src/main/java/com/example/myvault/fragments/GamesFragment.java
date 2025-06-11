@@ -23,6 +23,7 @@ import com.example.myvault.activities.DetailContentActivity;
 import com.example.myvault.adapters.GamesAdapter;
 import com.example.myvault.models.Content;
 import com.example.myvault.services.ContentService;
+import com.example.myvault.services.GamesService;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -47,6 +48,7 @@ public class GamesFragment extends Fragment {
     private List<Content> newGamesList = new ArrayList<>();
     private List<Content> upcomingGamesList = new ArrayList<>();
     private ContentService contentService;
+    private GamesService gamesService;
     private DatabaseReference dbRef;
     private View mainContent;
     private View progressBar;
@@ -105,14 +107,15 @@ public class GamesFragment extends Fragment {
         rvUpcomingGames.setAdapter(upcomingGamesAdapter);
 
         contentService = new ContentService(getContext());
+        gamesService = new GamesService(getContext());
 
         progressBar.setVisibility(View.VISIBLE);
 
         if (shouldUpdateToday()) {
             Log.d("GamesFragment", "Actualizando datos...");
-            contentService.fetchRecentGamesAndSave(requireContext(), () -> {
-                contentService.fetchPopularGamesAndSave(requireContext(), () -> {
-                    contentService.fetchUpcomingGamesAndSave(requireContext(), () -> {
+            gamesService.fetchRecentGamesAndSave(requireContext(), () -> {
+                gamesService.fetchPopularGamesAndSave(requireContext(), () -> {
+                    gamesService.fetchUpcomingGamesAndSave(requireContext(), () -> {
                         saveUpdateDate();
                         loadDB();
                     });
