@@ -93,10 +93,8 @@ public class InsertOrEditUser extends AppCompatActivity {
                                 });
 
                     } else {
-
                             createUser();
                             Toast.makeText(InsertOrEditUser.this, "Usuario creado2", Toast.LENGTH_SHORT).show();
-
                     }
                 }
             }

@@ -112,23 +112,9 @@ public class GamesService {
                                                     developers.add(developersArray.getJSONObject(j).getString("name"));
                                                 }
                                             }
-
                                             Content content = new Content(
-                                                    "cat_3",
-                                                    title,
-                                                    description,
-                                                    releaseDate,
-                                                    rating,
-                                                    coverImage,
-                                                    "RAWG",
-                                                    platforms,
-                                                    website,
-                                                    genres,
-                                                    developers,
-                                                    added,
-                                                    rawgID
+                                                    "cat_3", title, description, releaseDate, rating, coverImage, "RAWG", platforms, website, genres, developers, added, rawgID
                                             );
-
                                             content.setOrigin("recent_game_" + currentYear);
                                             contentService.insertGame(content);
                                             Log.d("ContentService", "Juego reciente añadido: " + title);
@@ -137,38 +123,30 @@ public class GamesService {
                                                 @Override
                                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                                                     if (!snapshot.exists()) {
-
-
                                                     } else {
                                                         Log.d("ContentService", "Juego reciente duplicado omitido: " + title);
                                                     }
                                                 }
-
                                                 @Override
                                                 public void onCancelled(@NonNull DatabaseError error) {
                                                     Log.e("Firebase", "Error buscando duplicados: " + error.getMessage());
                                                 }
                                             });
-
                                         } catch (JSONException e) {
                                             Log.e("ContentService", "Error procesando detalle de juego", e);
                                         }
                                     },
                                     error -> Log.e("ContentService", "Error solicitando detalles del juego", error)
                             );
-
                             queue.add(detailRequest);
                         }
-
                         prefs.edit().putLong("last_rawg_update", now).apply();
-
                     } catch (JSONException e) {
                         Log.e("ContentService", "Error procesando JSON principal", e);
                     }
                 },
                 error -> Log.e("ContentService", "Error en la solicitud RAWG", error)
         );
-
         queue.add(request);
         if (onComplete != null) onComplete.run();
 

@@ -132,6 +132,8 @@ public class MoviesFragment extends Fragment {
         dbRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long startTime = System.currentTimeMillis();
+
                 movieList.clear();
                 popularMoviesList.clear();
                 upcomingMoviesList.clear();
@@ -174,6 +176,8 @@ public class MoviesFragment extends Fragment {
 
                 progressBar.setVisibility(View.GONE);
                 mainContent.setVisibility(View.VISIBLE);
+                long endTime = System.currentTimeMillis();
+                Log.d("Performance", "Tiempo de carga: " + (endTime - startTime) + " ms");
             }
 
             @Override
