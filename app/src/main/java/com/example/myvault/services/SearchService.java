@@ -36,31 +36,31 @@ public class SearchService {
         void onError(Exception e);
     }
 
+    // Método para buscar contenido de forma mínima según la categoría y el término de búsqueda
     public static void searchMinimal(String query, Categories category, Callback<List<Content>> callback, Context context) {
         switch (category) {
             case PELICULAS:
-                buscarEnTMDb(query, "movie", callback, context);
+                buscarEnTMDb(query, "movie", callback, context); // Buscar películas en TMDb
                 break;
             case SERIES:
-                buscarEnTMDb(query, "tv", callback, context);
+                buscarEnTMDb(query, "tv", callback, context); // Buscar series en TMDb
                 break;
             case VIDEOJUEGOS:
-                buscarEnRAWG(query, callback, context);
+                buscarEnRAWG(query, callback, context); // Buscar videojuegos en RAWG
                 break;
             case ANIME:
-                buscarEnAniList(query, "ANIME", null, callback, context);
+                buscarEnAniList(query, "ANIME", null, callback, context); // Buscar anime en AniList
                 break;
             case MANGAS:
-                buscarEnAniList(query, "MANGA", null, callback, context);
+                buscarEnAniList(query, "MANGA", null, callback, context); // Buscar mangas en AniList
                 break;
             case NOVELAS_LIGERAS:
-                buscarEnAniList(query, "MANGA", "NOVEL", callback, context);
+                buscarEnAniList(query, "MANGA", "NOVEL", callback, context); // Buscar novelas ligeras en AniList
                 break;
         }
     }
 
-
-
+    // Método para obtener detalles completos de un contenido mínimo
     public static void fetchDetails(Content minimal, Callback<Content> callback, Context context) {
         Log.d("SearchService", "Buscando detalles de: " + minimal.getId());
         Log.d("SearchService", "Categoría: " + minimal.getCategoryID());
@@ -70,27 +70,27 @@ public class SearchService {
             callback.onError(new IllegalArgumentException("categoryID es null en Content"));
             return;
         }
-        Categories catenum = getCategoryEnumFromID(categoryID);
+        Categories catenum = getCategoryEnumFromID(categoryID); // Convertir ID de categoría a Enum
         Log.d("SearchService", "Categoría enum: " + catenum);
         switch (catenum) {
             case PELICULAS:
-                obtenerDetallesTMDb(minimal.getId(), "movie", callback, context);
+                obtenerDetallesTMDb(minimal.getId(), "movie", callback, context); // Obtener detalles de película
                 break;
             case SERIES:
-                obtenerDetallesTMDb(minimal.getId(), "tv", callback, context);
+                obtenerDetallesTMDb(minimal.getId(), "tv", callback, context); // Obtener detalles de serie
                 break;
             case VIDEOJUEGOS:
-                obtenerDetallesRAWG(minimal.getId(), callback, context);
+                obtenerDetallesRAWG(minimal.getId(), callback, context); // Obtener detalles de videojuego
                 break;
             case ANIME:
             case MANGAS:
             case NOVELAS_LIGERAS:
-                obtenerDetallesAniList(minimal.getId(), catenum, callback, context);
+                obtenerDetallesAniList(minimal.getId(), catenum, callback, context); // Obtener detalles de anime, manga o novela ligera
                 break;
         }
     }
 
-
+    // Método para convertir un ID de categoría a un valor del Enum Categories
     private static Categories getCategoryEnumFromID(String categoryID) {
         switch (categoryID) {
             case "cat_1":
@@ -110,7 +110,7 @@ public class SearchService {
         }
     }
 
-
+    // Método para buscar películas o series en TMDb
     private static void buscarEnTMDb(String query, String type, Callback<List<Content>> callback, Context context) {
         String url = "https://api.themoviedb.org/3/search/" + type +
                 "?api_key=87bb7efee694a2a79d9514b2c909e544&language=es-ES&query=" + Uri.encode(query);
@@ -132,6 +132,7 @@ public class SearchService {
                             JSONArray originCountries = obj.optJSONArray("origin_country");
                             boolean isJapanese = originalLanguage.equals("ja");
 
+                            // Comprobación adicional para series japonesas
                             if (originCountries != null) {
                                 for (int j = 0; j < originCountries.length(); j++) {
                                     String country = originCountries.getString(j);
@@ -142,6 +143,7 @@ public class SearchService {
                                 }
                             }
 
+                            // Se omiten animes si se está buscando series o películas
                             if (isJapanese) {
                                 Log.d("ContentService", "Omitida serie japonesa por tratarse de anime: " + obj.optString("name"));
                                 continue;
@@ -175,7 +177,7 @@ public class SearchService {
         queue.add(request);
     }
 
-
+    // Método para buscar videojuegos en RAWG
     private static void buscarEnRAWG(String query, Callback<List<Content>> callback, Context context) {
         String url = "https://api.rawg.io/api/games?key=bd8a21ccc892473cbb6c36919b2a9e56&search=" + Uri.encode(query);
         RequestQueue queue = Volley.newRequestQueue(context);
@@ -207,6 +209,7 @@ public class SearchService {
         queue.add(request);
     }
 
+    // Método para buscar anime, manga o novelas ligeras en AniList mediante GraphQL
     private static void buscarEnAniList(String query, String mediaType, String format, Callback<List<Content>> callback, Context context) {
         String graphql = "query ($search: String) { " +
                 "Page(perPage: 20) { " +
@@ -223,7 +226,7 @@ public class SearchService {
 
         JSONObject variables = new JSONObject();
         try {
-            variables.put("search", query);
+            variables.put("search", query); // Añadir término de búsqueda
         } catch (JSONException e) {
             callback.onError(e);
             return;
@@ -253,7 +256,7 @@ public class SearchService {
                             JSONObject obj = mediaArray.getJSONObject(i);
 
                             if (obj.optBoolean("isAdult", false)) {
-                                continue;
+                                continue; // Omitir contenido adulto
                             }
 
                             String id = obj.getString("id");

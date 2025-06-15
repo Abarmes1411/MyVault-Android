@@ -89,7 +89,12 @@ public class AddOrEditReviewActivity extends AppCompatActivity {
             userReview.setComment(reviewText);
             userReview.setRating(currentRating);
             userReview.setUserID(userId);
-            userReview.setContentID(contentID);
+            if (tmdbID != null) userReview.setContentID(tmdbID);
+            else if (tmdbTVID != null) userReview.setContentID(tmdbTVID);
+            else if (gameID != null) userReview.setContentID(gameID);
+            else if (mangaID != null) userReview.setContentID(mangaID);
+            else if (animeID != null) userReview.setContentID(animeID);
+            else if (novelID != null) userReview.setContentID(novelID);
 
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -100,7 +105,7 @@ public class AddOrEditReviewActivity extends AppCompatActivity {
             Log.d("ReviewActivity", "ID del usuario: " + userId);
 
 
-            userReviewService.insertOrUpdate(contentKey, userReview);
+            userReviewService.insertOrUpdate(contentID, userReview, contentKey);
 
             Toast.makeText(this, "Reseña guardada", Toast.LENGTH_SHORT).show();
 

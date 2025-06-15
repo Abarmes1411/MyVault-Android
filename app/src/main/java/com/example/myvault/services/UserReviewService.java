@@ -13,6 +13,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserReviewService {
 
 
@@ -24,9 +27,9 @@ public class UserReviewService {
 
     }
 
-    public void insertOrUpdate(String contentID, UserReview userReview) {
+    public void insertOrUpdate(String contentID, UserReview userReview, String contentKey) {
         DatabaseReference contentReviewRef = db.getReference("content")
-                .child(contentID)
+                .child(contentKey)
                 .child("userReviews");
 
         contentReviewRef.orderByChild("userID").equalTo(userReview.getUserID())
@@ -34,7 +37,7 @@ public class UserReviewService {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         if (snapshot.exists()) {
-                            // Ya existe una review: actualizamos
+                            // Ya existe una review del usuario: actualizamos
                             for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
                                 String existingReviewId = reviewSnapshot.getKey();
                                 userReview.setId(existingReviewId);
@@ -44,19 +47,35 @@ public class UserReviewService {
                                 break;
                             }
                         } else {
+                            // Nueva review
                             DatabaseReference newReference = contentReviewRef.push();
                             String id = newReference.getKey();
                             userReview.setId(id);
 
-                            newReference.setValue(userReview)
-                                    .addOnSuccessListener(aVoid -> Log.d("InsertReview", "Review nueva insertada con ID: " + id))
-                                    .addOnFailureListener(e -> Log.e("InsertReview", "Error al insertar la review", e));
+                            // Insertar en nodo de contenido (con userID incluido)
+                            Map<String, Object> fullReviewData = new HashMap<>();
+                            fullReviewData.put("id", userReview.getId());
+                            fullReviewData.put("comment", userReview.getComment());
+                            fullReviewData.put("rating", userReview.getRating());
+                            fullReviewData.put("contentID", userReview.getContentID());
+                            fullReviewData.put("reviewDate", userReview.getReviewDate());
+                            fullReviewData.put("userID", userReview.getUserID());
+
+                            newReference.setValue(fullReviewData)
+                                    .addOnSuccessListener(aVoid -> Log.d("InsertReview", "Review nueva insertada en content con ID: " + id))
+                                    .addOnFailureListener(e -> Log.e("InsertReview", "Error al insertar la review en content", e));
+
+                            // Insertar en nodo de usuario (sin userID)
+                            Map<String, Object> userReviewData = new HashMap<>(fullReviewData);
+                            userReviewData.remove("userID");
 
                             db.getReference("users")
                                     .child(userReview.getUserID())
                                     .child("userReviews")
                                     .child(id)
-                                    .setValue(userReview);
+                                    .setValue(userReviewData)
+                                    .addOnSuccessListener(aVoid -> Log.d("InsertReview", "Review también insertada en nodo usuario"))
+                                    .addOnFailureListener(e -> Log.e("InsertReview", "Error al insertar la review en nodo usuario", e));
                         }
                     }
 
@@ -66,6 +85,7 @@ public class UserReviewService {
                     }
                 });
     }
+
 
 
     public void update(String contentID, UserReview userReview) {

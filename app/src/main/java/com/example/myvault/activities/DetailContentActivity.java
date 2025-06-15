@@ -159,7 +159,6 @@ public class DetailContentActivity extends AppCompatActivity {
         tvOriginalRating = findViewById(R.id.tvOriginalRating);
         tvContentOrigin = findViewById(R.id.tvContentOrigin);
         tvAIOpinion = findViewById(R.id.tvAIOpinion);
-        tvAIReview = findViewById(R.id.tvAIReview);
         btnAddUserReview = findViewById(R.id.btnAddUserReview);
         tvPlatforms = findViewById(R.id.tvPlatforms);
         tvWebsite = findViewById(R.id.tvWebsite);
@@ -536,17 +535,22 @@ public class DetailContentActivity extends AppCompatActivity {
     }
 
     private void loadDB(String contentKey) {
+        // Referencias a elementos de la interfaz
         lvUserReview = findViewById(R.id.lvUserReview);
         tvAIReview = findViewById(R.id.tvAIReview);
         TextView tvEmptyMessage = findViewById(R.id.tvEmptyMessage);
 
+        // Referencia a la base de datos de Firebase
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference reviewsRef = database.getReference("content/" + contentKey + "/userReviews");
 
+        // Lista donde se guardarán las reviews junto a sus datos de usuario
         List<ReviewWithUserAUX> reviewList = new ArrayList<>();
+        // Adaptador para mostrar las reviews en el ListView
         UserReviewsInDetailContentAdapter adapter = new UserReviewsInDetailContentAdapter(this, reviewList);
         lvUserReview.setAdapter(adapter);
 
+        // Consultar las últimas 10 reviews ordenadas por fecha
         reviewsRef
                 .orderByChild("reviewDate")
                 .limitToLast(10)
@@ -554,15 +558,19 @@ public class DetailContentActivity extends AppCompatActivity {
                     @Override public void onDataChange(@NonNull DataSnapshot snapshot) {
                         reviewList.clear();
 
+                        // Si no hay reviews, se oculta el ListView y se muestra un mensaje vacío
                         if (!snapshot.exists()) {
                             lvUserReview.setVisibility(View.GONE);
                             tvEmptyMessage.setVisibility(View.VISIBLE);
                             return;
                         }
 
+                        // Total de reviews obtenidas
                         int totalReviews = (int) snapshot.getChildrenCount();
-                        final int[] loadedCount = {0}; // Contador para saber cuándo terminan todas las cargas
+                        // Contador para saber cuándo se han procesado todas
+                        final int[] loadedCount = {0};
 
+                        // Recorrer cada review
                         for (DataSnapshot reviewSnap : snapshot.getChildren()) {
                             UserReview review = reviewSnap.getValue(UserReview.class);
                             if (review == null) {
@@ -570,13 +578,16 @@ public class DetailContentActivity extends AppCompatActivity {
                                 continue;
                             }
 
+                            // Obtener ID de usuario asociado a la review
                             String userID = review.getUserID();
 
+                            // Buscar los datos del usuario a partir del ID
                             database.getReference("users/" + userID)
                                     .addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override public void onDataChange(@NonNull DataSnapshot userSnap) {
                                             User user = userSnap.getValue(User.class);
                                             if (user != null) {
+                                                // Añadir review con datos del usuario a la lista
                                                 reviewList.add(new ReviewWithUserAUX(
                                                         user,
                                                         review.getComment(),
@@ -586,7 +597,7 @@ public class DetailContentActivity extends AppCompatActivity {
                                             }
                                             loadedCount[0]++;
                                             if (loadedCount[0] == totalReviews) {
-                                                // Ya se han cargado todas las reviews con sus usuarios
+                                                // Cuando todas las reviews están cargadas, se actualiza el adaptador y se ajusta la altura
                                                 adapter.notifyDataSetChanged();
                                                 setListViewHeightBasedOnChildren(lvUserReview);
                                                 if (reviewList.isEmpty()) {
@@ -619,62 +630,71 @@ public class DetailContentActivity extends AppCompatActivity {
 
 
 
+
     private void queryContent(DatabaseReference ref, String child, String id) {
+        // Consulta a la base de datos buscando por un campo específico (por ejemplo, ID)
         ref.orderByChild(child).equalTo(id)
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        // Recorrer resultados encontrados
                         for (DataSnapshot contentSnap : snapshot.getChildren()) {
                             content = contentSnap.getValue(Content.class);
                             if (content != null) {
                                 contentKey = contentSnap.getKey();
+                                // Limpiar HTML de la descripción
                                 String descripcionHTMLLimpia = cleanDescription(content.getDescription());
 
+                                // Si la descripción es válida y está en inglés, se traduce con IA
                                 if (!descripcionHTMLLimpia.isEmpty() && descripcionHTMLLimpia.length() > 20) {
                                     if (englishCheck(descripcionHTMLLimpia)) {
-                                        traducirConDeepL(descripcionHTMLLimpia, traduccion -> {
+                                        tvAIReview = findViewById(R.id.tvAIReview);
+
+                                        AiServices ai = new AiServices(DetailContentActivity.this, contentKey, tvAIReview);
+
+                                        // Traducir descripción con DeepL
+                                        ai.traducirConDeepL(descripcionHTMLLimpia, traduccion -> {
                                             content.setDescription(traduccion);
 
+                                            // Guardar traducción en la base de datos
                                             FirebaseDatabase.getInstance().getReference("content")
                                                     .child(contentKey)
                                                     .child("description")
                                                     .setValue(traduccion);
 
+                                            // Mostrar descripción traducida
                                             if (tvDescription != null) {
                                                 tvDescription.setText("'" + traduccion + "'");
                                             }
 
+                                            // Cargar componentes visuales, estrellas, reviews y resumen AI
                                             loadComponents();
                                             loadUserReviewsAndDisplayStars(contentKey);
                                             loadDB(contentKey);
 
+                                            ai.loadAndGenerateSummary();
 
-                                            TextView tvAIReview = findViewById(R.id.tvAIReview);
-
-                                            AiServices summaryManager = new AiServices(contentKey, tvAIReview);
-                                            summaryManager.loadAndGenerateSummary();
-
-
+                                            // Ocultar barra de carga y mostrar contenido
                                             progressBar.setVisibility(View.GONE);
                                             detailContentRoot.setVisibility(View.VISIBLE);
 
                                         }, DetailContentActivity.this);
                                         return;
                                     } else {
+                                        // Si no está en inglés, se usa la descripción limpia sin traducir
                                         content.setDescription(descripcionHTMLLimpia);
                                     }
                                 } else {
+                                    // Si no hay descripción válida, se pone por defecto
                                     content.setDescription("Sinopsis no disponible");
                                 }
 
-
+                                // Cargar componentes, estrellas, reviews
                                 loadComponents();
                                 loadUserReviewsAndDisplayStars(contentKey);
                                 loadDB(contentKey);
 
-
-
-
+                                // Mostrar contenido y ocultar progreso
                                 progressBar.setVisibility(View.GONE);
                                 detailContentRoot.setVisibility(View.VISIBLE);
                                 break;
@@ -684,6 +704,7 @@ public class DetailContentActivity extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) {
+                        // Manejo de errores al consultar contenido
                         Log.e("FIREBASE", "Error al cargar el contenido: " + error.getMessage());
                         progressBar.setVisibility(View.GONE);
                         detailContentRoot.setVisibility(View.VISIBLE);
@@ -692,57 +713,14 @@ public class DetailContentActivity extends AppCompatActivity {
     }
 
 
+    // Metodo que limpia la descripción de HTML
     private String cleanDescription(String rawDescription) {
         if (rawDescription == null) return "";
         return Html.fromHtml(rawDescription, Html.FROM_HTML_MODE_LEGACY).toString().trim();
     }
 
-    private void traducirConDeepL(String textoOriginal, Consumer<String> callback, Context context) {
-        String url = "https://api-free.deepl.com/v2/translate";
 
-        RequestQueue queue = Volley.newRequestQueue(context);
-
-        StringRequest request = new StringRequest(Request.Method.POST, url,
-                response -> {
-                    try {
-                        JSONObject jsonResponse = new JSONObject(response);
-                        JSONArray translations = jsonResponse.getJSONArray("translations");
-                        String textoTraducido = translations.getJSONObject(0).getString("text");
-                        callback.accept(textoTraducido);
-                    } catch (JSONException e) {
-                        Log.e("DeepL", "Error al parsear traducción: " + e.getMessage());
-                        callback.accept(textoOriginal);
-                    }
-                },
-                error -> {
-                    Log.e("DeepL", "Error al traducir: " + error.toString());
-                    callback.accept(textoOriginal);
-                }) {
-
-            @Override
-            public Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("auth_key", apiKey);
-                params.put("text", textoOriginal);
-                params.put("target_lang", "ES");
-                return params;
-            }
-
-            @Override
-            protected Response<String> parseNetworkResponse(NetworkResponse response) {
-                try {
-                    String jsonString = new String(response.data, StandardCharsets.UTF_8);
-                    return Response.success(jsonString, HttpHeaderParser.parseCacheHeaders(response));
-                } catch (Exception e) {
-                    return Response.error(new ParseError(e));
-                }
-            }
-        };
-
-
-        queue.add(request);
-    }
-
+    // Metodo que comprueba si la descripción es en inglés o no
     private boolean englishCheck(String texto) {
         String lower = texto.toLowerCase();
         return lower.contains("the ") || lower.contains("is ") || lower.contains("with ") || lower.contains("a ") || lower.contains("in ");
@@ -827,7 +805,7 @@ public class DetailContentActivity extends AppCompatActivity {
 
 
 
-
+    // Metodo para obtener los nombres de los géneros a partir de sus IDs
     private String getGenreNamesFromStringIds(List<String> genreIds, Map<Integer, String> genreMap) {
         if (genreIds == null || genreIds.isEmpty()) {
             return "No disponible";
@@ -848,7 +826,7 @@ public class DetailContentActivity extends AppCompatActivity {
         return TextUtils.join(", ", genreNames);
     }
 
-
+    // Metodo para traducir géneros de juegos
     private static final Map<String, String> gameGenresMap = new HashMap<String, String>() {{
         put("Action", "Acción");
         put("Adventure", "Aventura");
@@ -882,62 +860,73 @@ public class DetailContentActivity extends AppCompatActivity {
     }
 
 
+    // Carga las reviews de un contenido específico desde Firebase y muestra las estrellas promedio
     private void loadUserReviewsAndDisplayStars(String contentKey) {
+        // Referencia al nodo de reseñas de usuarios dentro del contenido
         DatabaseReference reviewsRef = FirebaseDatabase.getInstance()
                 .getReference("content")
                 .child(contentKey)
                 .child("userReviews");
 
+        // Escucha una sola vez los datos del nodo
         reviewsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double totalRating = 0;
                 int count = 0;
 
+                // Recorre cada reseña de usuario
                 for (DataSnapshot reviewSnapshot : snapshot.getChildren()) {
+                    // Obtiene la puntuación (rating) de la reseña
                     Long ratingLong = reviewSnapshot.child("rating").getValue(Long.class);
                     if (ratingLong != null) {
-                        totalRating += ratingLong;
-                        count++;
+                        totalRating += ratingLong; // Suma la puntuación
+                        count++; // Aumenta el contador de reseñas válidas
                     }
                 }
 
+                // Si hay al menos una puntuación válida, calcula el promedio
                 if (count > 0) {
                     double averageRating = totalRating / count;
-                    updateStars(averageRating);
+                    updateStars(averageRating); // Muestra las estrellas según el promedio
                 } else {
-                    updateStars(0);
+                    updateStars(0); // Si no hay puntuaciones, muestra 0 estrellas
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
+                // En caso de error al leer de Firebase, se muestra un log de error
                 Log.e("Firebase", "Error al obtener reviews: " + error.getMessage());
             }
         });
     }
 
-
+    // Actualiza las estrellas en pantalla según la puntuación promedio
     private void updateStars(double average) {
+        // Array con las referencias a los ImageView de estrellas
         ImageView[] stars = {star1, star2, star3, star4, star5};
 
+        // Recorre cada estrella y decide qué imagen mostrar según el promedio
         for (int i = 0; i < stars.length; i++) {
             if (average >= i + 1) {
-                stars[i].setImageResource(R.drawable.full_star);
+                stars[i].setImageResource(R.drawable.full_star); // Estrella llena
             } else if (average >= i + 0.5) {
-                stars[i].setImageResource(R.drawable.half_star);
+                stars[i].setImageResource(R.drawable.half_star); // Media estrella
             } else {
-                stars[i].setImageResource(R.drawable.empty_star);
+                stars[i].setImageResource(R.drawable.empty_star); // Estrella vacía
             }
         }
     }
 
+    // Devuelve un texto con la etiqueta en negrita seguida de su valor
     private SpannableString boldLabel(String label, String value) {
         SpannableString spannable = new SpannableString(label + value);
         spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, label.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         return spannable;
     }
 
+    // Ajusta la altura de un ListView según sus elementos para que se vea completo
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
@@ -946,6 +935,7 @@ public class DetailContentActivity extends AppCompatActivity {
         }
 
         int totalHeight = 0;
+        // Mide la altura de cada ítem del ListView y la suma
         for (int i = 0; i < listAdapter.getCount(); i++) {
             View listItem = listAdapter.getView(i, null, listView);
             listItem.measure(
@@ -955,10 +945,11 @@ public class DetailContentActivity extends AppCompatActivity {
             totalHeight += listItem.getMeasuredHeight();
         }
 
+        // Ajusta la altura total del ListView incluyendo los espacios entre ítems
         ViewGroup.LayoutParams params = listView.getLayoutParams();
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
-        listView.requestLayout();
+        listView.requestLayout(); // Solicita que se redibuje con la nueva altura
     }
 
 }
