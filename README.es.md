@@ -1,4 +1,4 @@
-# 🎬📚🎮 Plataforma de Reseñas y Recomendaciones (Android)
+# 🎬📚🎮 Plataforma de Biblioteca y Reseñas (Android)
 
 Aplicación Android desarrollada como **Trabajo de Fin de Grado (TFG)** en Desarrollo de Aplicaciones Multiplataforma (DAM).  
 El proyecto consiste en una plataforma social donde los usuarios pueden **reseñar, puntuar, organizar y descubrir** contenido de entretenimiento en distintas categorías:
