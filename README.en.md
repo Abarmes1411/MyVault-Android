@@ -1,4 +1,4 @@
-# 🎬📚🎮 Review & Recommendation Platform (Android)
+# 🎬📚🎮 Library & Recommendation Platform (Android)
 
 Android application developed as the **Final Degree Project (TFG)** for the Multiplatform Application Development (DAM) program.  
 The project is a social platform where users can **review, rate, organize, and discover** entertainment content across different categories:
